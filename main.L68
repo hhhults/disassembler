@@ -1,0 +1,65 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 5/23/2022 11:18:38 AM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      :
+00000000                             3  * Written by :
+00000000                             4  * Date       :
+00000000                             5  * Description:
+00000000                             6  *-----------------------------------------------------------
+00001000                             7      ORG    $1000
+00001000                             8  START:
+00001000                             9      *JSR WELCOME
+00001000  247C 00005000             10      MOVEA.L #$5000,A2    * for testing
+00001006  267C 00006000             11      MOVEA.L #$6000,A3
+0000100C                            12      
+0000100C  143C 000F                 13      MOVE.B #$F,D2
+00001010  284A                      14      MOVEA.L  A2,A4      * does this need to be W depending on where in mem start is?
+00001012  4EB9 00001048             15      JSR TESTBIT
+00001018                            16  
+00001018                            17  
+00001018                            18  DONE                * end program
+00001018  103C 0009                 19      MOVE.B  #9,D0
+0000101C  4E4F                      20      TRAP    #15
+0000101E                            21      
+0000101E                            22  WELCOME
+0000101E  43F9 0000104E             23      LEA PROMPT1,A1  * get start memory value, put in A2
+00001024  103C 000E                 24      MOVE.B #14,D0
+00001028  4E4F                      25      TRAP #15
+0000102A  103C 0004                 26      MOVE.B #4,D0
+0000102E  4E4F                      27      TRAP #15
+00001030  2441                      28      MOVEA.L D1,A2
+00001032                            29      
+00001032  43F9 0000108A             30      LEA PROMPT2,A1  * get end memory value, put in D3
+00001038  103C 000E                 31      MOVE.B #14,D0
+0000103C  4E4F                      32      TRAP #15
+0000103E  103C 0004                 33      MOVE.B #4,D0
+00001042  4E4F                      34      TRAP #15
+00001044  2641                      35      MOVEA.L D1,A3
+00001046  4E75                      36      RTS
+00001048                            37      
+00001048                            38  TESTBIT
+00001048  3614                      39      MOVE.W (A4),D3
+0000104A  0503                      40      BTST.L D2,D3
+0000104C  4E75                      41      RTS
+0000104E                            42      
+0000104E                            43  * string storage
+0000104E= 50 6C 65 61 73 65 ...     44  PROMPT1  DC.B  'Please enter the memory value of the start of the program: ',0
+0000108A= 50 6C 65 61 73 65 ...     45  PROMPT2  DC.B  'Please enter the memory value of the end of the program: ',0
+000010C4                            46  
+000010C4                            47      END    START
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+DONE                1018
+PROMPT1             104E
+PROMPT2             108A
+START               1000
+TESTBIT             1048
+WELCOME             101E
