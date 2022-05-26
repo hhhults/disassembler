@@ -1,8 +1,8 @@
 *-----------------------------------------------------------
 * Title      : motorola 68k disassembler prototype
 * Written by : Harper Hults
-* Date       : 5/23/22
-* Description: expect you to load a testfile in at $5000. checks the 15th bit.
+* Date       : 5/25/22
+* Description: allows for decoding of MOVEB and MOVEQ opcodes.
 *-----------------------------------------------------------
     ORG    $1000
 START:
