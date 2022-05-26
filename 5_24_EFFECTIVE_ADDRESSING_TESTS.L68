@@ -1,0 +1,254 @@
+00001000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 5/25/2022 10:56:43 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : 422 FINAL PROJECT TEST 2.0
+00000000                             3  * Written by : CAMAS COLLINS 
+00000000                             4  * Date       : 5/24/2022
+00000000                             5  * Description:
+00000000                             6  *-----------------------------------------------------------
+00000000                             7  
+00000000                             8  *NOTES: 
+00000000                             9  *   MOVE THE NEW LINE CARRAGE TO AFTER THE DESTINATION LOOP 
+00000000                            10  *   TO MOVE TO THE LABEL IN THE ADDRESS REGISTER - JSR (An)
+00000000                            11  *   DONT FORGET TO RTS AT THE END OF EACH SUBROUTINE
+00000000                            12  
+00000000                            13  
+00000000                            14  
+00000000                            15  ;carrage return and line feed txt
+00000000  =0000000D                 16  CR          EQU $0D
+00000000  =0000000A                 17  LF          EQU $0A
+00000000                            18  
+00000000                            19  ;necessary symbols for displaying EA's
+00000000= 44 00                     20  P_D         DC.B    'D',0
+00000002= 41 00                     21  P_A         DC.B    'A',0
+00000004= 28 00                     22  P_OPEN_PAR  DC.B    '(',0
+00000006= 29 00                     23  P_CLOSE_PAR DC.B    ')',0
+00000008= 2B 00                     24  P_PLUS      DC.B    '+',0
+0000000A= 2D 00                     25  P_MINUS     DC.B    '-',0
+0000000C= 23 00                     26  P_HASH      DC.B    '#',0
+0000000E= 24 00                     27  P_HEX       DC.B    '$',0
+00000010= 25 00                     28  P_BINARY    DC.B    '%',0
+00000012= 2C 00                     29  P_COMMA     DC.B    ',',0
+00000014= 0D 0A 00                  30  NXT_LINE    DC.B    CR,LF,0
+00000017                            31  
+00000017                            32  
+00000017                            33  *-----------------------------------------------------------
+00000017                            34  
+00001000                            35              ORG    $1000
+00001000                            36  START:      
+00001000                            37  
+00001000  263C 00002E06             38              MOVE.L  #%0010111000000110,D3      ;MOVE.L  D6,D7 FOR TESTING
+00001006  2A7C 00002000             39              MOVEA.L #$00002000,A5
+0000100C                            40              
+0000100C                            41        
+0000100C                            42  *-----------------------------------------------------------
+0000100C                            43  BUILD_EA_TREE   ;BUILDS THE BINARY EA TREE FOR COMPARISONS
+0000100C                            44              
+0000100C  2AFC 00001096             45              MOVE.L  #M_DR,(A5)+
+00001012  2AFC 000010A2             46              MOVE.L  #M_AR,(A5)+
+00001018  2AFC 000010AE             47              MOVE.L  #M_DIR_A,(A5)+
+0000101E  2AFC 000010CE             48              MOVE.L  #M_API,(A5)+
+00001024  2AFC 000010F8             49              MOVE.L  #M_APD,(A5)+
+0000102A  2AFC 00001122             50              MOVE.L  #M_IA,(A5)+
+00001030  2AFC 0000112E             51              MOVE.L  #M_ALA,(A5)+
+00001036  2AFC 0000113A             52              MOVE.L  #M_AWA,(A5)+
+0000103C                            53              
+0000103C                            54  *-----------------------------------------------------------          
+0000103C                            55  CHK_EA_SOURCE     ;COMPARES A SOURCE MODE FROM THE OPCODE TO THE EA TREE
+0000103C  4284                      56              CLR.L   D4
+0000103E  4285                      57              CLR.L   D5
+00001040  4286                      58              CLR.L   D6
+00001042  183C 0003                 59              MOVE.B  #3,D4
+00001046  1C3C 0006                 60              MOVE.B  #6,D6
+0000104A                            61  EA_SOURCE_LOOP    
+0000104A  0903                      62              BTST    D4,D3
+0000104C  6600 0032                 63              BNE     SET_BIT
+00001050                            64  EA_SOURCE_BACK
+00001050  5204                      65              ADDI.B  #1,D4
+00001052  B846                      66              CMP     D6,D4
+00001054  6DF4                      67              BLT     EA_SOURCE_LOOP   
+00001056                            68              
+00001056  E68D                      69              LSR.L   #$3,D5
+00001058                            70              
+00001058  BA3C 0007                 71              CMP.B   #$7,D5
+0000105C  6700 0038                 72              BEQ     IS_ABS_IMM
+00001060                            73              
+00001060  CAFC 0004                 74              MULU.W  #$4,D5
+00001064  0645 2000                 75              ADDI.W  #$2000,D5
+00001068  2A45                      76              MOVEA.L D5,A5
+0000106A  2C55                      77              MOVEA.L (A5),A6
+0000106C  4E96                      78              JSR     (A6)
+0000106E                            79  ;ADD CODE TO PULL THE REGISTER NUMBER HERE
+0000106E  43F8 0012                 80              LEA     P_COMMA,A1
+00001072  303C 000E                 81              MOVE    #14,D0
+00001076  4E4F                      82              TRAP    #15
+00001078                            83  
+00001078  7808                      84              MOVE.L  #$8,D4
+0000107A                            85              
+0000107A  4EF9 00001084             86              JMP     CHK_EA_DEST
+00001080                            87  
+00001080                            88  SET_BIT  
+00001080  09C5                      89              BSET    D4,D5
+00001082  60CC                      90              BRA     EA_SOURCE_BACK
+00001084                            91                          
+00001084                            92  *-----------------------------------------------------------
+00001084                            93  CHK_EA_DEST       ;COMPARES A DESTINATION MODE FROM THE OPCODE TO THE EA TREE
+00001084  0D03                      94              BTST    D6,D3
+00001086                            95              
+00001086                            96              
+00001086  43F8 0014                 97              LEA     NXT_LINE,A1
+0000108A  303C 000E                 98              MOVE    #14,D0
+0000108E  4E4F                      99              TRAP    #15
+00001090                           100              
+00001090  4EF9 0000114A            101              JMP     DONE    ;TEMP INSTRUCTION DURRING TESTING         
+00001096                           102  *-----------------------------------------------------------
+00001096                           103  IS_ABS_IMM                           
+00001096                           104  
+00001096                           105  *-----------------------------------------------------------    
+00001096                           106  M_DR    ;IF MODE IS A DATA REGISTER Dn
+00001096                           107              
+00001096  43F8 0000                108              LEA     P_D,A1
+0000109A  103C 000E                109              MOVE.B  #14,D0    
+0000109E  4E4F                     110              TRAP    #15 
+000010A0                           111              
+000010A0  4E75                     112              RTS
+000010A2                           113  *-----------------------------------------------------------            
+000010A2                           114  M_AR    ;IF MODE IS AN ADDRESS REGISTER An
+000010A2                           115  
+000010A2  43F8 0002                116              LEA     P_A,A1
+000010A6  103C 000E                117              MOVE.B  #14,D0    
+000010AA  4E4F                     118              TRAP    #15   
+000010AC                           119              
+000010AC  4E75                     120              RTS
+000010AE                           121  *-----------------------------------------------------------
+000010AE                           122  M_DIR_A ;IF MODE IS A DIRECT ADDRESS (An)
+000010AE                           123  
+000010AE  43F8 0004                124              LEA     P_OPEN_PAR,A1
+000010B2  103C 000E                125              MOVE.B  #14,D0    
+000010B6  4E4F                     126              TRAP    #15 
+000010B8                           127              
+000010B8  43F8 0002                128              LEA     P_A,A1
+000010BC  103C 000E                129              MOVE.B  #14,D0    
+000010C0  4E4F                     130              TRAP    #15
+000010C2                           131              
+000010C2  43F8 0006                132              LEA     P_CLOSE_PAR,A1
+000010C6  103C 000E                133              MOVE.B  #14,D0    
+000010CA  4E4F                     134              TRAP    #15
+000010CC                           135              
+000010CC  4E75                     136              RTS  
+000010CE                           137  *-----------------------------------------------------------
+000010CE                           138  M_API   ;IF MODE IS AN ADDRESS WITH POSTINCREMENT (An)+
+000010CE                           139  
+000010CE  43F8 0004                140              LEA     P_OPEN_PAR,A1
+000010D2  103C 000E                141              MOVE.B  #14,D0    
+000010D6  4E4F                     142              TRAP    #15 
+000010D8                           143              
+000010D8  43F8 0002                144              LEA     P_A,A1
+000010DC  103C 000E                145              MOVE.B  #14,D0    
+000010E0  4E4F                     146              TRAP    #15
+000010E2                           147              
+000010E2  43F8 0006                148              LEA     P_CLOSE_PAR,A1
+000010E6  103C 000E                149              MOVE.B  #14,D0    
+000010EA  4E4F                     150              TRAP    #15
+000010EC                           151              
+000010EC  43F8 0008                152              LEA     P_PLUS,A1
+000010F0  103C 000E                153              MOVE.B  #14,D0    
+000010F4  4E4F                     154              TRAP    #15
+000010F6                           155              
+000010F6  4E75                     156              RTS  
+000010F8                           157  *-----------------------------------------------------------
+000010F8                           158  M_APD   ;IF MODE IS AN ADDRESS WITH PREDECREMENT -(An)
+000010F8                           159  
+000010F8  43F8 000A                160              LEA     P_MINUS,A1
+000010FC  103C 000E                161              MOVE.B  #14,D0    
+00001100  4E4F                     162              TRAP    #15
+00001102                           163  
+00001102  43F8 0004                164              LEA     P_OPEN_PAR,A1
+00001106  103C 000E                165              MOVE.B  #14,D0    
+0000110A  4E4F                     166              TRAP    #15 
+0000110C                           167              
+0000110C  43F8 0002                168              LEA     P_A,A1
+00001110  103C 000E                169              MOVE.B  #14,D0    
+00001114  4E4F                     170              TRAP    #15
+00001116                           171              
+00001116  43F8 0006                172              LEA     P_CLOSE_PAR,A1
+0000111A  103C 000E                173              MOVE.B  #14,D0    
+0000111E  4E4F                     174              TRAP    #15
+00001120                           175              
+00001120  4E75                     176              RTS  
+00001122                           177  *-----------------------------------------------------------
+00001122                           178  M_IA    ;IF MODE IS IMMIDIATE ADDRESSING #IMM
+00001122                           179  
+00001122  43F8 000C                180              LEA     P_HASH,A1
+00001126  103C 000E                181              MOVE.B  #14,D0    
+0000112A  4E4F                     182              TRAP    #15 
+0000112C                           183  
+0000112C  4E75                     184              RTS
+0000112E                           185  *-----------------------------------------------------------
+0000112E                           186  M_ALA   ;IF MODE IS AN ABSOLUTE LONG ADDRESS (xxx).L
+0000112E                           187  
+0000112E  43F8 000E                188              LEA     P_HEX,A1
+00001132  103C 000E                189              MOVE.B  #14,D0    
+00001136  4E4F                     190              TRAP    #15 
+00001138                           191  
+00001138  4E75                     192              RTS  
+0000113A                           193  *-----------------------------------------------------------
+0000113A                           194  M_AWA   ;IF MODE IS AN ABSOLUTE WORD ADDRESS (xxx).W
+0000113A                           195  
+0000113A  43F8 000E                196              LEA     P_HEX,A1
+0000113E  103C 000E                197              MOVE.B  #14,D0    
+00001142  4E4F                     198              TRAP    #15 
+00001144                           199  
+00001144  4E75                     200              RTS  
+00001146                           201  *-----------------------------------------------------------
+00001146                           202  C_MOVE_EA   ;CHECK MOVE INSTRUCTION EA
+00001146                           203  
+00001146  103C 000E                204              MOVE.B  #14,D0  
+0000114A                           205  
+0000114A                           206  *-----------------------------------------------------------
+0000114A                           207  DONE
+0000114A  103C 0009                208              MOVE.B  #9,D0
+0000114E  4E4F                     209              TRAP    #15
+00001150                           210  
+00001150                           211      END    START       
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+BUILD_EA_TREE       100C
+CHK_EA_DEST         1084
+CHK_EA_SOURCE       103C
+CR                  D
+C_MOVE_EA           1146
+DONE                114A
+EA_SOURCE_BACK      1050
+EA_SOURCE_LOOP      104A
+IS_ABS_IMM          1096
+LF                  A
+M_ALA               112E
+M_APD               10F8
+M_API               10CE
+M_AR                10A2
+M_AWA               113A
+M_DIR_A             10AE
+M_DR                1096
+M_IA                1122
+NXT_LINE            14
+P_A                 2
+P_BINARY            10
+P_CLOSE_PAR         6
+P_COMMA             12
+P_D                 0
+P_HASH              C
+P_HEX               E
+P_MINUS             A
+P_OPEN_PAR          4
+P_PLUS              8
+SET_BIT             1080
+START               1000
