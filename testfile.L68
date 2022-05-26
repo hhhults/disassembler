@@ -1,6 +1,6 @@
 00005000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 5/25/2022 10:45:41 PM
+Created On: 5/26/2022 2:41:28 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :test file
@@ -9,15 +9,18 @@ Created On: 5/25/2022 10:45:41 PM
 00000000                             5  * Description:has a couple instructions to load into memory for the disassembler
 00000000                             6  *-----------------------------------------------------------
 00005000                             7      ORG    $5000
-00005000                             8  START:                  ; first instruction of program
-00005000                             9  
-00005000  123C 00FF                 10      MOVE.B #$FF,D1
-00005004  4E71                      11      NOP
-00005006  FFFF FFFF                 12      SIMHALT             ; halt simulator
-0000500A                            13  
-0000500A                            14  * Put variables and constants here
-0000500A                            15  
-0000500A                            16      END    START        ; last line of source
+00005000                             8  START:   
+00005000  4640                       9      NOT.W D0
+00005002  45F9 00005008             10      LEA BOOB,A2
+00005008                            11      
+00005008= 62 6F 6F 62 73 00         12  BOOB DC.B 'boobs',0
+0000500E                            13      
+0000500E                            14  DONE
+0000500E  FFFF FFFF                 15      SIMHALT             ; halt simulator
+00005012                            16  
+00005012                            17  * Put variables and constants here
+00005012                            18  
+00005012                            19      END    START        ; last line of source
 
 No errors detected
 No warnings generated
@@ -26,4 +29,6 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
+BOOB                5008
+DONE                500E
 START               5000

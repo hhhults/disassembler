@@ -8,14 +8,16 @@
 START:
     *JSR WELCOME
     MOVEA.L #$5000,A2    * for testing
-    MOVEA.L #$6000,A3
-    MOVE.B #$F,D2
+    MOVEA.L #$5020,A3
     MOVEA.L  A2,A4      * does this need to be W depending on where in mem start is?
     
     JSR BUILDTREE
-    MOVEA.L TREE,A5
-    MOVEA.L (A5),A1
-    JSR (A1)
+    
+NEXTLINE JSR DECODE_OP
+         CMP.L A4,A3
+         BEQ DONE
+         ADDA.W #2,A4
+         BRA NEXTLINE
 
 
 DONE                * end program
@@ -41,15 +43,14 @@ WELCOME
 BUILDTREE
         MOVE.W #0,D0
         MOVEA.L TREE,A1
-BLDLOOP *LEA UNDEF,A6      * initialize whole tree to undefined
-        MOVE.L #UNDEF,(A1)+
+BLDLOOP MOVE.L #UNDEF,(A1)+    * initialize whole tree to undefined
         ADDQ #1,D0
         CMP.W #513,D0
         BNE BLDLOOP
         
         MOVEA.L TREE,A1
 
-        MOVE.L #TESTBIT,(A1)+ * nodes 0 - 11 are decision nodes
+        MOVE.L #TESTBIT,(A1)+  * nodes 0 - 11 are decision nodes
         MOVE.L #TESTBIT,(A1)+
         MOVE.L #TESTBIT,(A1)+
         MOVE.L #TESTBIT,(A1)+
@@ -61,53 +62,197 @@ BLDLOOP *LEA UNDEF,A6      * initialize whole tree to undefined
         MOVE.L #TESTBIT,(A1)+
         MOVE.L #TESTBIT,(A1)+
         MOVE.L #TESTBIT,(A1)+
-
-        
-            * node 12 is an invalid code
-        MOVE.L #BAD,(A1)+
-        
+        MOVE.L #BAD,(A1)+      * node 12 is an invalid code
         MOVE.L #TESTBIT,(A1)+  * nodes 13&14 are decision nodes
-        MOVE.L #TESTBIT,(A1)+ 
+        MOVE.L #TESTBIT,(A1)+
+        MOVE.L #BAD,(A1)+      * node 15 is an invalid node
+        MOVE.L #MOVEB,(A1)+    * put MOVE.B at node 16
+        MOVE.L #MOVEL,(A1)+    * MOVE.L/MOVEA.L goes at node 17
+        MOVE.L #MOVEW,(A1)+    * MOVE.W/MOVEA.W goes at 18
+        MOVE.L #NOPETC,(A1)+   * NOP et al. subroutine goes at 19
+        MOVE.L #ADDQ,(A1)+     * ADDQ goes at 20
+        MOVE.L #TESTBIT,(A1)+  * 21 is a decision node
+        MOVE.L #MOVEQ,(A1)+    * MOVEQ goes at 22
+        MOVE.L #BAD,(A1)+      * 23 is invalid code
+        MOVE.L #SUB,(A1)+      * 24 is SUB
         
-        *
-        *
-        *
-            * node 15 is an invalid node
-        MOVEA.L TREE,A1
-        ADDA.L #$58,A1
-        MOVE.L #BAD,(A1)
+        ADDA.W #8,A1           * should put us at TREE + $6C
+        MOVE.L #AND,(A1)+      * node 27 is AND
+        MOVE.L #ADD,(A1)+      * node 28 is ADD
+        MOVE.L #TESTBIT,(A1)+  * 29 is a decision node
+        MOVE.L #BAD,(A1)+      * 30 is invalid code, puts us at TREE + $7C
         
-            * put MOVEQ at node 22
-        MOVEA.L TREE,A1
-        ADDA.L #$58,A1
-        MOVE.L #MOVEQ,(A1)
+        ADDA.W #$30,A1         * go to TREE + $AC which is node 43
+        MOVE.L #TESTBIT,(A1)+  * 43 is decision node
+        MOVE.L #TESTBIT,(A1)   * 44 is decision node, should be B0
         
-            * put MOVE.B at node 16
-        MOVEA.L TREE,A1
-        ADDA.L #$40,A1
-        MOVE.L #MOVEB,(A1)
+        ADDA.W #$3C,A1         * should put us at TREE + $EC
+        MOVE.L #TESTBIT,(A1)+  * node 59 is decision
+        MOVE.L #BAD,(A1)       * node 60 is invalid code
+        
+        ADDA.W #$6C,A1         * should put us at TREE + $15C
+        MOVE.L #BRA,(A1)+      * node 87 is BRA
+        MOVE.L #BEQ,(A1)+      * node 88 is BEQ
+        MOVE.L #BAD,(A1)+      * node 89 is an invalid code
+        MOVE.L #TESTBIT,(A1)   * node 90 is a decision node
+        
+        ADDA.W #$74,A1         * should put us at TREE + $DC?
+        MOVE.L #TESTBIT,(A1)+  * nodes 119,120 are decision nodes
+        MOVE.L #TESTBIT,(A1)   * A1= TREE + $1E0?
+        
+        ADDA.W #$F4,A1         * puts us at TREE + $2D4?
+        MOVE.L #BAD,(A1)+      * node 181 is an invalid code
+        MOVE.L #TESTBIT,(A1)   * node 182 is a decision node
+        
+        ADDA.W #$E4,A1
+        MOVE.L #TESTBIT,(A1)+  * node 239 is a deicsion node
+        MOVE.L #TESTBIT,(A1)+  * node 240 is a deicsion node
+        MOVE.L #BAD,(A1)+      * node 241 is an invalid code
+        MOVE.L #TESTBIT,(A1)   * node 242 is a deicsion node
+        
+        ADDA.W #$1EC,A1
+        MOVE.L #BGT,(A1)+      * node 365 is BGT
+        MOVE.L #BLE,(A1)       * node 366 is BLE
+        
+        ADDA.W #$1C4,A1
+        MOVE.L #ASR,(A1)+      * node 479 is ASR
+        MOVE.L #ASL,(A1)+      * node 480 is ASL
+        MOVE.L #LSR,(A1)+      * node 481 is LSR
+        MOVE.L #LSL,(A1)       * node 482 is LSL
+        
+        ADDA.W #$C,A1
+        MOVE.L #ROR,(A1)+      * node 485 is ROR
+        MOVE.L #ROL,(A1)       * node 486 is ROL
         
         RTS
+    
+DECODE_OP MOVE.B #$F,D2 * decodes the opcode at A4
+          MOVEA.L TREE,A5
+          MOVEA.L (A5),A1
+          JSR (A1)
+          RTS    
     
 UNDEF LEA UNDEFINED,A1
       MOVE.B #14,D0
       TRAP #15
-      JSR DONE 
+      RTS 
       
 BAD   LEA BADDATA,A1
       MOVE.B #14,D0
       TRAP #15
-      JSR DONE
+      RTS
       
 MOVEB  LEA MB,A1
        MOVE.B #14,D0
        TRAP #15
        RTS 
       
-MOVEQ LEA MQP,A1
+MOVEQ LEA MQ,A1
        MOVE.B #14,D0
        TRAP #15
-       RTS 
+       RTS
+       
+MOVEL LEA ML,A1
+      MOVE.B #14,D0
+      TRAP #15
+      RTS
+      
+MOVEW LEA MW,A1
+      MOVE.B #14,D0
+      TRAP #15
+      RTS
+      
+SUB   LEA SB,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS      
+      
+NOPETC MOVE.L (A4),D3
+       ROL.L #8,D3
+       CMP.B #$46,D3
+       BEQ NOT
+       
+       MOVE.L (A4),D3
+       BTST.L #7,D3
+       BNE LEA * this is around where the problem is
+       BTST.L D2,D3
+       BEQ BAD
+       RTS
+       
+NOT    LEA NT,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS     
+
+LEA    LEA LA,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS       
+       
+ADDQ   LEA AQ,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS
+
+AND    LEA AN,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS
+       
+ADD    LEA AD,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS
+
+BRA   LEA BR,A1
+      MOVE.B #14,D0
+      TRAP #15
+      RTS
+
+BEQ   LEA BE,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS
+       
+BGT   LEA BG,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS
+       
+BLE   LEA BL,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS
+       
+ASR   LEA AR,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS
+       
+ASL   LEA AL,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS
+       
+LSR   LEA LR,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS
+       
+LSL   LEA LL,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS
+       
+ROR   LEA RR,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS
+       
+ROL   LEA RL,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS
 
 TESTBIT
     MOVE.W (A4),D3
@@ -138,14 +283,36 @@ NOT_ZERO  * if bit D2 of (A4) is one (go right on tree)
 * var storage
 TREE DC.L $7000    
 * string storage
+CR EQU $0D
+LF EQU $09
 PROMPT1  DC.B  'Please enter the memory value of the start of the program: ',0
 PROMPT2  DC.B  'Please enter the memory value of the end of the program: ',0
 UNDEFINED DC.B 'The program should never reach this state.',0
-BADDATA  DC.B 'The data on line ____ is not a valid opcode.',0
-MQP DC.B 'Congrats! You successfully found MOVEQ!',0
-MB  DC.B 'found MOVEB',0
+BADDATA  DC.B 'The data on line ____ is not a valid opcode.',CR,LF,0
+MQ DC.B 'MOVEQ ',0
+MB  DC.B 'MOVE.B ',0
+ML  DC.B 'MOVE.L/MOVEA.L ',0
+MW  DC.B 'MOVE.W/MOVEA.W ',0
+NP DC.B 'NOP ',0
+NT DC.B 'NOT',0
+AQ DC.B 'ADDQ ',0
+AN DC.B 'AND ',0
+AD DC.B 'ADD ',0
+BR DC.B 'BRA ',0
+BE DC.B 'BEQ ',0
+BG DC.B 'BGT ',0
+BL DC.B 'BLE ',0
+AR DC.B 'ASR ',0
+AL DC.B 'ASL ',0
+LA DC.B 'LEA ',0
+LR DC.B 'LSR ',0
+LL DC.B 'LSL ',0
+RR DC.B 'ROR ',0
+RL DC.B 'ROL ',0
+SB DC.B 'SUB ',0
 
     END    START
+
 
 
 *~Font name~Courier New~
