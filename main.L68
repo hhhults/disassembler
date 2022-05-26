@@ -1,54 +1,155 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 5/23/2022 11:18:38 AM
+Created On: 5/25/2022 10:52:00 PM
 
 00000000                             1  *-----------------------------------------------------------
-00000000                             2  * Title      :
-00000000                             3  * Written by :
-00000000                             4  * Date       :
-00000000                             5  * Description:
+00000000                             2  * Title      : motorola 68k disassembler prototype
+00000000                             3  * Written by : Harper Hults
+00000000                             4  * Date       : 5/23/22
+00000000                             5  * Description: expect you to load a testfile in at $5000. checks the 15th bit.
 00000000                             6  *-----------------------------------------------------------
 00001000                             7      ORG    $1000
 00001000                             8  START:
 00001000                             9      *JSR WELCOME
 00001000  247C 00005000             10      MOVEA.L #$5000,A2    * for testing
 00001006  267C 00006000             11      MOVEA.L #$6000,A3
-0000100C                            12      
-0000100C  143C 000F                 13      MOVE.B #$F,D2
-00001010  284A                      14      MOVEA.L  A2,A4      * does this need to be W depending on where in mem start is?
-00001012  4EB9 00001048             15      JSR TESTBIT
-00001018                            16  
-00001018                            17  
-00001018                            18  DONE                * end program
-00001018  103C 0009                 19      MOVE.B  #9,D0
-0000101C  4E4F                      20      TRAP    #15
-0000101E                            21      
-0000101E                            22  WELCOME
-0000101E  43F9 0000104E             23      LEA PROMPT1,A1  * get start memory value, put in A2
-00001024  103C 000E                 24      MOVE.B #14,D0
-00001028  4E4F                      25      TRAP #15
-0000102A  103C 0004                 26      MOVE.B #4,D0
-0000102E  4E4F                      27      TRAP #15
-00001030  2441                      28      MOVEA.L D1,A2
-00001032                            29      
-00001032  43F9 0000108A             30      LEA PROMPT2,A1  * get end memory value, put in D3
-00001038  103C 000E                 31      MOVE.B #14,D0
-0000103C  4E4F                      32      TRAP #15
-0000103E  103C 0004                 33      MOVE.B #4,D0
-00001042  4E4F                      34      TRAP #15
-00001044  2641                      35      MOVEA.L D1,A3
-00001046  4E75                      36      RTS
-00001048                            37      
-00001048                            38  TESTBIT
-00001048  3614                      39      MOVE.W (A4),D3
-0000104A  0503                      40      BTST.L D2,D3
-0000104C  4E75                      41      RTS
-0000104E                            42      
-0000104E                            43  * string storage
-0000104E= 50 6C 65 61 73 65 ...     44  PROMPT1  DC.B  'Please enter the memory value of the start of the program: ',0
-0000108A= 50 6C 65 61 73 65 ...     45  PROMPT2  DC.B  'Please enter the memory value of the end of the program: ',0
-000010C4                            46  
-000010C4                            47      END    START
+0000100C  143C 000F                 12      MOVE.B #$F,D2
+00001010  284A                      13      MOVEA.L  A2,A4      * does this need to be W depending on where in mem start is?
+00001012                            14      
+00001012  4EB9 00001052             15      JSR BUILDTREE
+00001018  2A79 00001176             16      MOVEA.L TREE,A5
+0000101E  2255                      17      MOVEA.L (A5),A1
+00001020  4E91                      18      JSR (A1)
+00001022                            19  
+00001022                            20  
+00001022                            21  DONE                * end program
+00001022  103C 0009                 22      MOVE.B  #9,D0
+00001026  4E4F                      23      TRAP    #15
+00001028                            24      
+00001028                            25  WELCOME
+00001028  43F9 0000117A             26      LEA PROMPT1,A1  * get start memory value, put in A2
+0000102E  103C 000E                 27      MOVE.B #14,D0
+00001032  4E4F                      28      TRAP #15
+00001034  103C 0004                 29      MOVE.B #4,D0
+00001038  4E4F                      30      TRAP #15
+0000103A  2441                      31      MOVEA.L D1,A2
+0000103C                            32      
+0000103C  43F9 000011B6             33      LEA PROMPT2,A1  * get end memory value, put in D3
+00001042  103C 000E                 34      MOVE.B #14,D0
+00001046  4E4F                      35      TRAP #15
+00001048  103C 0004                 36      MOVE.B #4,D0
+0000104C  4E4F                      37      TRAP #15
+0000104E  2641                      38      MOVEA.L D1,A3
+00001050  4E75                      39      RTS
+00001052                            40      
+00001052                            41  BUILDTREE
+00001052  303C 0000                 42          MOVE.W #0,D0
+00001056  2279 00001176             43          MOVEA.L TREE,A1
+0000105C                            44  BLDLOOP *LEA UNDEF,A6      * initialize whole tree to undefined
+0000105C  22FC 00001102             45          MOVE.L #UNDEF,(A1)+
+00001062  5240                      46          ADDQ #1,D0
+00001064  B07C 0201                 47          CMP.W #513,D0
+00001068  66F2                      48          BNE BLDLOOP
+0000106A                            49          
+0000106A  2279 00001176             50          MOVEA.L TREE,A1
+00001070                            51  
+00001070  22FC 0000113E             52          MOVE.L #TESTBIT,(A1)+ * nodes 0 - 11 are decision nodes
+00001076  22FC 0000113E             53          MOVE.L #TESTBIT,(A1)+
+0000107C  22FC 0000113E             54          MOVE.L #TESTBIT,(A1)+
+00001082  22FC 0000113E             55          MOVE.L #TESTBIT,(A1)+
+00001088  22FC 0000113E             56          MOVE.L #TESTBIT,(A1)+
+0000108E  22FC 0000113E             57          MOVE.L #TESTBIT,(A1)+
+00001094  22FC 0000113E             58          MOVE.L #TESTBIT,(A1)+
+0000109A  22FC 0000113E             59          MOVE.L #TESTBIT,(A1)+
+000010A0  22FC 0000113E             60          MOVE.L #TESTBIT,(A1)+
+000010A6  22FC 0000113E             61          MOVE.L #TESTBIT,(A1)+
+000010AC  22FC 0000113E             62          MOVE.L #TESTBIT,(A1)+
+000010B2  22FC 0000113E             63          MOVE.L #TESTBIT,(A1)+
+000010B8                            64  
+000010B8                            65          
+000010B8                            66              * node 12 is an invalid code
+000010B8  22FC 00001112             67          MOVE.L #BAD,(A1)+
+000010BE                            68          
+000010BE  22FC 0000113E             69          MOVE.L #TESTBIT,(A1)+  * nodes 13&14 are decision nodes
+000010C4  22FC 0000113E             70          MOVE.L #TESTBIT,(A1)+ 
+000010CA                            71          
+000010CA                            72          *
+000010CA                            73          *
+000010CA                            74          *
+000010CA                            75              * node 15 is an invalid node
+000010CA  2279 00001176             76          MOVEA.L TREE,A1
+000010D0  D3FC 00000058             77          ADDA.L #$58,A1
+000010D6  22BC 00001112             78          MOVE.L #BAD,(A1)
+000010DC                            79          
+000010DC                            80              * put MOVEQ at node 22
+000010DC  2279 00001176             81          MOVEA.L TREE,A1
+000010E2  D3FC 00000058             82          ADDA.L #$58,A1
+000010E8  22BC 00001130             83          MOVE.L #MOVEQ,(A1)
+000010EE                            84          
+000010EE                            85              * put MOVE.B at node 16
+000010EE  2279 00001176             86          MOVEA.L TREE,A1
+000010F4  D3FC 00000040             87          ADDA.L #$40,A1
+000010FA  22BC 00001122             88          MOVE.L #MOVEB,(A1)
+00001100                            89          
+00001100  4E75                      90          RTS
+00001102                            91      
+00001102  43F9 000011F0             92  UNDEF LEA UNDEFINED,A1
+00001108  103C 000E                 93        MOVE.B #14,D0
+0000110C  4E4F                      94        TRAP #15
+0000110E  4EB8 1022                 95        JSR DONE 
+00001112                            96        
+00001112  43F9 0000121B             97  BAD   LEA BADDATA,A1
+00001118  103C 000E                 98        MOVE.B #14,D0
+0000111C  4E4F                      99        TRAP #15
+0000111E  4EB8 1022                100        JSR DONE
+00001122                           101        
+00001122  43F9 00001270            102  MOVEB  LEA MB,A1
+00001128  103C 000E                103         MOVE.B #14,D0
+0000112C  4E4F                     104         TRAP #15
+0000112E  4E75                     105         RTS 
+00001130                           106        
+00001130  43F9 00001248            107  MOVEQ LEA MQP,A1
+00001136  103C 000E                108         MOVE.B #14,D0
+0000113A  4E4F                     109         TRAP #15
+0000113C  4E75                     110         RTS 
+0000113E                           111  
+0000113E                           112  TESTBIT
+0000113E  3614                     113      MOVE.W (A4),D3
+00001140  220D                     114      MOVE.L A5,D1
+00001142  92B9 00001176            115      SUB.L TREE,D1
+00001148  E381                     116      ASL.L #1,D1
+0000114A  2A41                     117      MOVEA.L D1,A5
+0000114C  0503                     118      BTST.L D2,D3
+0000114E  6700 0006                119      BEQ IS_ZERO
+00001152  6000 0012                120      BRA NOT_ZERO
+00001156                           121      
+00001156                           122  IS_ZERO   * if bit D2 of (A4) is zero (go left on tree)
+00001156  5342                     123      SUBQ #1,D2
+00001158  584D                     124      ADDA.W #4,A5
+0000115A  DBF9 00001176            125      ADDA.L TREE,A5
+00001160  2255                     126      MOVEA.L (A5),A1
+00001162  4E91                     127      JSR (A1)
+00001164  4E75                     128      RTS
+00001166                           129  
+00001166                           130  NOT_ZERO  * if bit D2 of (A4) is one (go right on tree)
+00001166  5342                     131      SUBQ #1,D2
+00001168  504D                     132      ADDA.W #8,A5
+0000116A  DBF9 00001176            133      ADDA.L TREE,A5
+00001170  2255                     134      MOVEA.L (A5),A1
+00001172  4E91                     135      JSR (A1)
+00001174  4E75                     136      RTS
+00001176                           137      
+00001176                           138  * var storage
+00001176= 00007000                 139  TREE DC.L $7000    
+0000117A                           140  * string storage
+0000117A= 50 6C 65 61 73 65 ...    141  PROMPT1  DC.B  'Please enter the memory value of the start of the program: ',0
+000011B6= 50 6C 65 61 73 65 ...    142  PROMPT2  DC.B  'Please enter the memory value of the end of the program: ',0
+000011F0= 54 68 65 20 70 72 ...    143  UNDEFINED DC.B 'The program should never reach this state.',0
+0000121B= 54 68 65 20 64 61 ...    144  BADDATA  DC.B 'The data on line ____ is not a valid opcode.',0
+00001248= 43 6F 6E 67 72 61 ...    145  MQP DC.B 'Congrats! You successfully found MOVEQ!',0
+00001270= 66 6F 75 6E 64 20 ...    146  MB  DC.B 'found MOVEB',0
+0000127C                           147  
+0000127C                           148      END    START
 
 No errors detected
 No warnings generated
@@ -57,9 +158,22 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-DONE                1018
-PROMPT1             104E
-PROMPT2             108A
+BAD                 1112
+BADDATA             121B
+BLDLOOP             105C
+BUILDTREE           1052
+DONE                1022
+IS_ZERO             1156
+MB                  1270
+MOVEB               1122
+MOVEQ               1130
+MQP                 1248
+NOT_ZERO            1166
+PROMPT1             117A
+PROMPT2             11B6
 START               1000
-TESTBIT             1048
-WELCOME             101E
+TESTBIT             113E
+TREE                1176
+UNDEF               1102
+UNDEFINED           11F0
+WELCOME             1028

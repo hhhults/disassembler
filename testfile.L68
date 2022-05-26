@@ -1,6 +1,6 @@
 00005000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 5/23/2022 10:31:10 AM
+Created On: 5/25/2022 10:45:41 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :test file
@@ -11,14 +11,13 @@ Created On: 5/23/2022 10:31:10 AM
 00005000                             7      ORG    $5000
 00005000                             8  START:                  ; first instruction of program
 00005000                             9  
-00005000  4E71                      10      NOP
-00005002  123C 00FF                 11      MOVE.B #$FF,D1
-00005006                            12  
-00005006  FFFF FFFF                 13      SIMHALT             ; halt simulator
-0000500A                            14  
-0000500A                            15  * Put variables and constants here
-0000500A                            16  
-0000500A                            17      END    START        ; last line of source
+00005000  123C 00FF                 10      MOVE.B #$FF,D1
+00005004  4E71                      11      NOP
+00005006  FFFF FFFF                 12      SIMHALT             ; halt simulator
+0000500A                            13  
+0000500A                            14  * Put variables and constants here
+0000500A                            15  
+0000500A                            16      END    START        ; last line of source
 
 No errors detected
 No warnings generated

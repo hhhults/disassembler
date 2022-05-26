@@ -7,14 +7,14 @@
     ORG    $5000
 START:                  ; first instruction of program
 
+    *MOVE.B #$FF,D1
     NOP
-    MOVE.B #$FF,D1
-
     SIMHALT             ; halt simulator
 
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 *~Font name~Courier New~
