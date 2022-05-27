@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 5/26/2022 2:44:06 PM
+Created On: 5/27/2022 4:00:40 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : motorola 68k disassembler prototype
@@ -15,306 +15,342 @@ Created On: 5/26/2022 2:44:06 PM
 00001006  267C 00005020             11      MOVEA.L #$5020,A3
 0000100C  284A                      12      MOVEA.L  A2,A4      * does this need to be W depending on where in mem start is?
 0000100E                            13      
-0000100E  4EB9 00001054             14      JSR BUILDTREE
+0000100E  4EB9 00001060             14      JSR BUILDTREE
 00001014                            15      
-00001014  4EB9 000011D8             16  NEXTLINE JSR DECODE_OP
+00001014  4EB9 000011E4             16  NEXTLINE JSR DECODE_OP
 0000101A  B7CC                      17           CMP.L A4,A3
-0000101C  6700 0006                 18           BEQ DONE
+0000101C  6700 0012                 18           BEQ DONE
 00001020  544C                      19           ADDA.W #2,A4
-00001022  60F0                      20           BRA NEXTLINE
-00001024                            21  
-00001024                            22  
-00001024                            23  DONE                * end program
-00001024  103C 0009                 24      MOVE.B  #9,D0
-00001028  4E4F                      25      TRAP    #15
-0000102A                            26      
-0000102A                            27  WELCOME
-0000102A  43F9 00001374             28      LEA PROMPT1,A1  * get start memory value, put in A2
-00001030  103C 000E                 29      MOVE.B #14,D0
-00001034  4E4F                      30      TRAP #15
-00001036  103C 0004                 31      MOVE.B #4,D0
-0000103A  4E4F                      32      TRAP #15
-0000103C  2441                      33      MOVEA.L D1,A2
-0000103E                            34      
-0000103E  43F9 000013B0             35      LEA PROMPT2,A1  * get end memory value, put in D3
-00001044  103C 000E                 36      MOVE.B #14,D0
-00001048  4E4F                      37      TRAP #15
-0000104A  103C 0004                 38      MOVE.B #4,D0
-0000104E  4E4F                      39      TRAP #15
-00001050  2641                      40      MOVEA.L D1,A3
-00001052  4E75                      41      RTS
-00001054                            42      
-00001054                            43  BUILDTREE
-00001054  303C 0000                 44          MOVE.W #0,D0
-00001058  2279 00001370             45          MOVEA.L TREE,A1
-0000105E  22FC 000011E8             46  BLDLOOP MOVE.L #UNDEF,(A1)+    * initialize whole tree to undefined
-00001064  5240                      47          ADDQ #1,D0
-00001066  B07C 0201                 48          CMP.W #513,D0
-0000106A  66F2                      49          BNE BLDLOOP
-0000106C                            50          
-0000106C  2279 00001370             51          MOVEA.L TREE,A1
-00001072                            52  
-00001072  22FC 00001338             53          MOVE.L #TESTBIT,(A1)+  * nodes 0 - 11 are decision nodes
-00001078  22FC 00001338             54          MOVE.L #TESTBIT,(A1)+
-0000107E  22FC 00001338             55          MOVE.L #TESTBIT,(A1)+
-00001084  22FC 00001338             56          MOVE.L #TESTBIT,(A1)+
-0000108A  22FC 00001338             57          MOVE.L #TESTBIT,(A1)+
-00001090  22FC 00001338             58          MOVE.L #TESTBIT,(A1)+
-00001096  22FC 00001338             59          MOVE.L #TESTBIT,(A1)+
-0000109C  22FC 00001338             60          MOVE.L #TESTBIT,(A1)+
-000010A2  22FC 00001338             61          MOVE.L #TESTBIT,(A1)+
-000010A8  22FC 00001338             62          MOVE.L #TESTBIT,(A1)+
-000010AE  22FC 00001338             63          MOVE.L #TESTBIT,(A1)+
-000010B4  22FC 00001338             64          MOVE.L #TESTBIT,(A1)+
-000010BA  22FC 000011F6             65          MOVE.L #BAD,(A1)+      * node 12 is an invalid code
-000010C0  22FC 00001338             66          MOVE.L #TESTBIT,(A1)+  * nodes 13&14 are decision nodes
-000010C6  22FC 00001338             67          MOVE.L #TESTBIT,(A1)+
-000010CC  22FC 000011F6             68          MOVE.L #BAD,(A1)+      * node 15 is an invalid node
-000010D2  22FC 00001204             69          MOVE.L #MOVEB,(A1)+    * put MOVE.B at node 16
-000010D8  22FC 00001220             70          MOVE.L #MOVEL,(A1)+    * MOVE.L/MOVEA.L goes at node 17
-000010DE  22FC 0000122E             71          MOVE.L #MOVEW,(A1)+    * MOVE.W/MOVEA.W goes at 18
-000010E4  22FC 0000124A             72          MOVE.L #NOPETC,(A1)+   * NOP et al. subroutine goes at 19
-000010EA  22FC 00001282             73          MOVE.L #ADDQ,(A1)+     * ADDQ goes at 20
-000010F0  22FC 00001338             74          MOVE.L #TESTBIT,(A1)+  * 21 is a decision node
-000010F6  22FC 00001212             75          MOVE.L #MOVEQ,(A1)+    * MOVEQ goes at 22
-000010FC  22FC 000011F6             76          MOVE.L #BAD,(A1)+      * 23 is invalid code
-00001102  22FC 0000123C             77          MOVE.L #SUB,(A1)+      * 24 is SUB
-00001108                            78          
-00001108  5049                      79          ADDA.W #8,A1           * should put us at TREE + $6C
-0000110A  22FC 00001290             80          MOVE.L #AND,(A1)+      * node 27 is AND
-00001110  22FC 0000129E             81          MOVE.L #ADD,(A1)+      * node 28 is ADD
-00001116  22FC 00001338             82          MOVE.L #TESTBIT,(A1)+  * 29 is a decision node
-0000111C  22FC 000011F6             83          MOVE.L #BAD,(A1)+      * 30 is invalid code, puts us at TREE + $7C
-00001122                            84          
-00001122  D2FC 0030                 85          ADDA.W #$30,A1         * go to TREE + $AC which is node 43
-00001126  22FC 00001338             86          MOVE.L #TESTBIT,(A1)+  * 43 is decision node
-0000112C  22BC 00001338             87          MOVE.L #TESTBIT,(A1)   * 44 is decision node, should be B0
-00001132                            88          
-00001132  D2FC 003C                 89          ADDA.W #$3C,A1         * should put us at TREE + $EC
-00001136  22FC 00001338             90          MOVE.L #TESTBIT,(A1)+  * node 59 is decision
-0000113C  22BC 000011F6             91          MOVE.L #BAD,(A1)       * node 60 is invalid code
-00001142                            92          
-00001142  D2FC 006C                 93          ADDA.W #$6C,A1         * should put us at TREE + $15C
-00001146  22FC 000012AC             94          MOVE.L #BRA,(A1)+      * node 87 is BRA
-0000114C  22FC 000012BA             95          MOVE.L #BEQ,(A1)+      * node 88 is BEQ
-00001152  22FC 000011F6             96          MOVE.L #BAD,(A1)+      * node 89 is an invalid code
-00001158  22BC 00001338             97          MOVE.L #TESTBIT,(A1)   * node 90 is a decision node
-0000115E                            98          
-0000115E  D2FC 0074                 99          ADDA.W #$74,A1         * should put us at TREE + $DC?
-00001162  22FC 00001338            100          MOVE.L #TESTBIT,(A1)+  * nodes 119,120 are decision nodes
-00001168  22BC 00001338            101          MOVE.L #TESTBIT,(A1)   * A1= TREE + $1E0?
-0000116E                           102          
-0000116E  D2FC 00F4                103          ADDA.W #$F4,A1         * puts us at TREE + $2D4?
-00001172  22FC 000011F6            104          MOVE.L #BAD,(A1)+      * node 181 is an invalid code
-00001178  22BC 00001338            105          MOVE.L #TESTBIT,(A1)   * node 182 is a decision node
-0000117E                           106          
-0000117E  D2FC 00E4                107          ADDA.W #$E4,A1
-00001182  22FC 00001338            108          MOVE.L #TESTBIT,(A1)+  * node 239 is a deicsion node
-00001188  22FC 00001338            109          MOVE.L #TESTBIT,(A1)+  * node 240 is a deicsion node
-0000118E  22FC 000011F6            110          MOVE.L #BAD,(A1)+      * node 241 is an invalid code
-00001194  22BC 00001338            111          MOVE.L #TESTBIT,(A1)   * node 242 is a deicsion node
-0000119A                           112          
-0000119A  D2FC 01EC                113          ADDA.W #$1EC,A1
-0000119E  22FC 000012C8            114          MOVE.L #BGT,(A1)+      * node 365 is BGT
-000011A4  22BC 000012D6            115          MOVE.L #BLE,(A1)       * node 366 is BLE
-000011AA                           116          
-000011AA  D2FC 01C4                117          ADDA.W #$1C4,A1
-000011AE  22FC 000012E4            118          MOVE.L #ASR,(A1)+      * node 479 is ASR
-000011B4  22FC 000012F2            119          MOVE.L #ASL,(A1)+      * node 480 is ASL
-000011BA  22FC 00001300            120          MOVE.L #LSR,(A1)+      * node 481 is LSR
-000011C0  22BC 0000130E            121          MOVE.L #LSL,(A1)       * node 482 is LSL
-000011C6                           122          
-000011C6  D2FC 000C                123          ADDA.W #$C,A1
-000011CA  22FC 0000131C            124          MOVE.L #ROR,(A1)+      * node 485 is ROR
-000011D0  22BC 0000132A            125          MOVE.L #ROL,(A1)       * node 486 is ROL
-000011D6                           126          
-000011D6  4E75                     127          RTS
-000011D8                           128      
-000011D8  143C 000F                129  DECODE_OP MOVE.B #$F,D2 * decodes the opcode at A4
-000011DC  2A79 00001370            130            MOVEA.L TREE,A5
-000011E2  2255                     131            MOVEA.L (A5),A1
-000011E4  4E91                     132            JSR (A1)
-000011E6  4E75                     133            RTS    
-000011E8                           134      
-000011E8  43F9 000013EA            135  UNDEF LEA UNDEFINED,A1
-000011EE  103C 000E                136        MOVE.B #14,D0
-000011F2  4E4F                     137        TRAP #15
-000011F4  4E75                     138        RTS 
-000011F6                           139        
-000011F6  43F9 00001415            140  BAD   LEA BADDATA,A1
-000011FC  103C 000E                141        MOVE.B #14,D0
-00001200  4E4F                     142        TRAP #15
-00001202  4E75                     143        RTS
-00001204                           144        
-00001204  43F9 0000144B            145  MOVEB  LEA MB,A1
-0000120A  103C 000E                146         MOVE.B #14,D0
-0000120E  4E4F                     147         TRAP #15
-00001210  4E75                     148         RTS 
-00001212                           149        
-00001212  43F9 00001444            150  MOVEQ LEA MQ,A1
-00001218  103C 000E                151         MOVE.B #14,D0
-0000121C  4E4F                     152         TRAP #15
-0000121E  4E75                     153         RTS
-00001220                           154         
-00001220  43F9 00001453            155  MOVEL LEA ML,A1
-00001226  103C 000E                156        MOVE.B #14,D0
-0000122A  4E4F                     157        TRAP #15
-0000122C  4E75                     158        RTS
-0000122E                           159        
-0000122E  43F9 00001463            160  MOVEW LEA MW,A1
-00001234  103C 000E                161        MOVE.B #14,D0
-00001238  4E4F                     162        TRAP #15
-0000123A  4E75                     163        RTS
-0000123C                           164        
-0000123C  43F9 000014C3            165  SUB   LEA SB,A1
-00001242  103C 000E                166         MOVE.B #14,D0
-00001246  4E4F                     167         TRAP #15
-00001248  4E75                     168         RTS      
-0000124A                           169        
-0000124A  2614                     170  NOPETC MOVE.L (A4),D3
-0000124C  E19B                     171         ROL.L #8,D3
-0000124E  B63C 0046                172         CMP.B #$46,D3
-00001252  6700 0012                173         BEQ NOT
-00001256  2614                     174         MOVE.L (A4),D3
-00001258  0803 0007                175         BTST.L #7,D3
-0000125C  6600 0016                176         BNE LEA
-00001260  0503                     177         BTST.L D2,D3
-00001262  6792                     178         BEQ BAD
-00001264  4E75                     179         RTS
-00001266                           180         
-00001266  43F9 00001478            181  NOT    LEA NT,A1
-0000126C  103C 000E                182         MOVE.B #14,D0
-00001270  4E4F                     183         TRAP #15
-00001272  4E75                     184         RTS     
-00001274                           185  
-00001274  43F9 000014AA            186  LEA    LEA LA,A1
-0000127A  103C 000E                187         MOVE.B #14,D0
-0000127E  4E4F                     188         TRAP #15
-00001280  4E75                     189         RTS       
-00001282                           190         
-00001282  43F9 0000147C            191  ADDQ   LEA AQ,A1
-00001288  103C 000E                192         MOVE.B #14,D0
-0000128C  4E4F                     193         TRAP #15
-0000128E  4E75                     194         RTS
-00001290                           195  
-00001290  43F9 00001482            196  AND    LEA AN,A1
-00001296  103C 000E                197         MOVE.B #14,D0
-0000129A  4E4F                     198         TRAP #15
-0000129C  4E75                     199         RTS
-0000129E                           200         
-0000129E  43F9 00001487            201  ADD    LEA AD,A1
-000012A4  103C 000E                202         MOVE.B #14,D0
-000012A8  4E4F                     203         TRAP #15
-000012AA  4E75                     204         RTS
-000012AC                           205  
-000012AC  43F9 0000148C            206  BRA   LEA BR,A1
-000012B2  103C 000E                207        MOVE.B #14,D0
-000012B6  4E4F                     208        TRAP #15
-000012B8  4E75                     209        RTS
-000012BA                           210  
-000012BA  43F9 00001491            211  BEQ   LEA BE,A1
-000012C0  103C 000E                212         MOVE.B #14,D0
-000012C4  4E4F                     213         TRAP #15
-000012C6  4E75                     214         RTS
-000012C8                           215         
-000012C8  43F9 00001496            216  BGT   LEA BG,A1
-000012CE  103C 000E                217         MOVE.B #14,D0
-000012D2  4E4F                     218         TRAP #15
-000012D4  4E75                     219         RTS
-000012D6                           220         
-000012D6  43F9 0000149B            221  BLE   LEA BL,A1
-000012DC  103C 000E                222         MOVE.B #14,D0
-000012E0  4E4F                     223         TRAP #15
-000012E2  4E75                     224         RTS
-000012E4                           225         
-000012E4  43F9 000014A0            226  ASR   LEA AR,A1
-000012EA  103C 000E                227         MOVE.B #14,D0
-000012EE  4E4F                     228         TRAP #15
-000012F0  4E75                     229         RTS
-000012F2                           230         
-000012F2  43F9 000014A5            231  ASL   LEA AL,A1
-000012F8  103C 000E                232         MOVE.B #14,D0
-000012FC  4E4F                     233         TRAP #15
-000012FE  4E75                     234         RTS
-00001300                           235         
-00001300  43F9 000014AF            236  LSR   LEA LR,A1
-00001306  103C 000E                237         MOVE.B #14,D0
-0000130A  4E4F                     238         TRAP #15
-0000130C  4E75                     239         RTS
-0000130E                           240         
-0000130E  43F9 000014B4            241  LSL   LEA LL,A1
-00001314  103C 000E                242         MOVE.B #14,D0
-00001318  4E4F                     243         TRAP #15
-0000131A  4E75                     244         RTS
-0000131C                           245         
-0000131C  43F9 000014B9            246  ROR   LEA RR,A1
-00001322  103C 000E                247         MOVE.B #14,D0
-00001326  4E4F                     248         TRAP #15
-00001328  4E75                     249         RTS
-0000132A                           250         
-0000132A  43F9 000014BE            251  ROL   LEA RL,A1
-00001330  103C 000E                252         MOVE.B #14,D0
-00001334  4E4F                     253         TRAP #15
-00001336  4E75                     254         RTS
-00001338                           255  
-00001338                           256  TESTBIT
-00001338  3614                     257      MOVE.W (A4),D3
-0000133A  220D                     258      MOVE.L A5,D1
-0000133C  92B9 00001370            259      SUB.L TREE,D1
-00001342  E381                     260      ASL.L #1,D1
-00001344  2A41                     261      MOVEA.L D1,A5
-00001346  0503                     262      BTST.L D2,D3
-00001348  6700 0006                263      BEQ IS_ZERO
-0000134C  6000 0012                264      BRA NOT_ZERO
-00001350                           265      
-00001350                           266  IS_ZERO   * if bit D2 of (A4) is zero (go left on tree)
-00001350  5342                     267      SUBQ #1,D2
-00001352  584D                     268      ADDA.W #4,A5
-00001354  DBF9 00001370            269      ADDA.L TREE,A5
-0000135A  2255                     270      MOVEA.L (A5),A1
-0000135C  4E91                     271      JSR (A1)
-0000135E  4E75                     272      RTS
-00001360                           273  
-00001360                           274  NOT_ZERO  * if bit D2 of (A4) is one (go right on tree)
-00001360  5342                     275      SUBQ #1,D2
-00001362  504D                     276      ADDA.W #8,A5
-00001364  DBF9 00001370            277      ADDA.L TREE,A5
-0000136A  2255                     278      MOVEA.L (A5),A1
-0000136C  4E91                     279      JSR (A1)
-0000136E  4E75                     280      RTS
-00001370                           281      
-00001370                           282  * var storage
-00001370= 00007000                 283  TREE DC.L $7000    
-00001374                           284  * string storage
-00001374  =0000000D                285  CR EQU $0D
-00001374  =00000009                286  LF EQU $09
-00001374= 50 6C 65 61 73 65 ...    287  PROMPT1  DC.B  'Please enter the memory value of the start of the program: ',0
-000013B0= 50 6C 65 61 73 65 ...    288  PROMPT2  DC.B  'Please enter the memory value of the end of the program: ',0
-000013EA= 54 68 65 20 70 72 ...    289  UNDEFINED DC.B 'The program should never reach this state.',0
-00001415= 54 68 65 20 64 61 ...    290  BADDATA  DC.B 'The data on line ____ is not a valid opcode.',CR,LF,0
-00001444= 4D 4F 56 45 51 20 00     291  MQ DC.B 'MOVEQ ',0
-0000144B= 4D 4F 56 45 2E 42 ...    292  MB  DC.B 'MOVE.B ',0
-00001453= 4D 4F 56 45 2E 4C ...    293  ML  DC.B 'MOVE.L/MOVEA.L ',0
-00001463= 4D 4F 56 45 2E 57 ...    294  MW  DC.B 'MOVE.W/MOVEA.W ',0
-00001473= 4E 4F 50 20 00           295  NP DC.B 'NOP ',0
-00001478= 4E 4F 54 00              296  NT DC.B 'NOT',0
-0000147C= 41 44 44 51 20 00        297  AQ DC.B 'ADDQ ',0
-00001482= 41 4E 44 20 00           298  AN DC.B 'AND ',0
-00001487= 41 44 44 20 00           299  AD DC.B 'ADD ',0
-0000148C= 42 52 41 20 00           300  BR DC.B 'BRA ',0
-00001491= 42 45 51 20 00           301  BE DC.B 'BEQ ',0
-00001496= 42 47 54 20 00           302  BG DC.B 'BGT ',0
-0000149B= 42 4C 45 20 00           303  BL DC.B 'BLE ',0
-000014A0= 41 53 52 20 00           304  AR DC.B 'ASR ',0
-000014A5= 41 53 4C 20 00           305  AL DC.B 'ASL ',0
-000014AA= 4C 45 41 20 00           306  LA DC.B 'LEA ',0
-000014AF= 4C 53 52 20 00           307  LR DC.B 'LSR ',0
-000014B4= 4C 53 4C 20 00           308  LL DC.B 'LSL ',0
-000014B9= 52 4F 52 20 00           309  RR DC.B 'ROR ',0
-000014BE= 52 4F 4C 20 00           310  RL DC.B 'ROL ',0
-000014C3= 53 55 42 20 00           311  SB DC.B 'SUB ',0
-000014C8                           312  
-000014C8                           313      END    START
+00001022  43F9 000013D8             20           LEA NEWLINE,A1
+00001028  103C 000D                 21           MOVE.B #13,D0
+0000102C  4E4F                      22           TRAP #15
+0000102E  60E4                      23           BRA NEXTLINE
+00001030                            24  
+00001030                            25  
+00001030                            26  DONE                * end program
+00001030  103C 0009                 27      MOVE.B  #9,D0
+00001034  4E4F                      28      TRAP    #15
+00001036                            29      
+00001036                            30  WELCOME
+00001036  43F9 000013DB             31      LEA PROMPT1,A1  * get start memory value, put in A2
+0000103C  103C 000E                 32      MOVE.B #14,D0
+00001040  4E4F                      33      TRAP #15
+00001042  103C 0004                 34      MOVE.B #4,D0
+00001046  4E4F                      35      TRAP #15
+00001048  2441                      36      MOVEA.L D1,A2
+0000104A                            37      
+0000104A  43F9 00001417             38      LEA PROMPT2,A1  * get end memory value, put in D3
+00001050  103C 000E                 39      MOVE.B #14,D0
+00001054  4E4F                      40      TRAP #15
+00001056  103C 0004                 41      MOVE.B #4,D0
+0000105A  4E4F                      42      TRAP #15
+0000105C  2641                      43      MOVEA.L D1,A3
+0000105E  4E75                      44      RTS
+00001060                            45      
+00001060                            46  BUILDTREE
+00001060  303C 0000                 47          MOVE.W #0,D0
+00001064  2279 000013D4             48          MOVEA.L TREE,A1
+0000106A  22FC 000011F4             49  BLDLOOP MOVE.L #UNDEF,(A1)+    * initialize whole tree to undefined
+00001070  5240                      50          ADDQ #1,D0
+00001072  B07C 0201                 51          CMP.W #513,D0
+00001076  66F2                      52          BNE BLDLOOP
+00001078                            53          
+00001078  2279 000013D4             54          MOVEA.L TREE,A1
+0000107E                            55  
+0000107E  22FC 0000139C             56          MOVE.L #TESTBIT,(A1)+  * nodes 0 - 11 are decision nodes
+00001084  22FC 0000139C             57          MOVE.L #TESTBIT,(A1)+
+0000108A  22FC 0000139C             58          MOVE.L #TESTBIT,(A1)+
+00001090  22FC 0000139C             59          MOVE.L #TESTBIT,(A1)+
+00001096  22FC 0000139C             60          MOVE.L #TESTBIT,(A1)+
+0000109C  22FC 0000139C             61          MOVE.L #TESTBIT,(A1)+
+000010A2  22FC 0000139C             62          MOVE.L #TESTBIT,(A1)+
+000010A8  22FC 0000139C             63          MOVE.L #TESTBIT,(A1)+
+000010AE  22FC 0000139C             64          MOVE.L #TESTBIT,(A1)+
+000010B4  22FC 0000139C             65          MOVE.L #TESTBIT,(A1)+
+000010BA  22FC 0000139C             66          MOVE.L #TESTBIT,(A1)+
+000010C0  22FC 0000139C             67          MOVE.L #TESTBIT,(A1)+
+000010C6  22FC 00001202             68          MOVE.L #BAD,(A1)+      * node 12 is an invalid code
+000010CC  22FC 0000139C             69          MOVE.L #TESTBIT,(A1)+  * nodes 13&14 are decision nodes
+000010D2  22FC 0000139C             70          MOVE.L #TESTBIT,(A1)+
+000010D8  22FC 00001202             71          MOVE.L #BAD,(A1)+      * node 15 is an invalid node
+000010DE  22FC 00001210             72          MOVE.L #MOVEB,(A1)+    * put MOVE.B at node 16
+000010E4  22FC 0000122C             73          MOVE.L #MOVEL,(A1)+    * MOVE.L/MOVEA.L goes at node 17
+000010EA  22FC 0000123A             74          MOVE.L #MOVEW,(A1)+    * MOVE.W/MOVEA.W goes at 18
+000010F0  22FC 00001256             75          MOVE.L #NOPETC,(A1)+   * NOP et al. subroutine goes at 19
+000010F6  22FC 000012E6             76          MOVE.L #ADDQ,(A1)+     * ADDQ goes at 20
+000010FC  22FC 0000139C             77          MOVE.L #TESTBIT,(A1)+  * 21 is a decision node
+00001102  22FC 0000121E             78          MOVE.L #MOVEQ,(A1)+    * MOVEQ goes at 22
+00001108  22FC 00001202             79          MOVE.L #BAD,(A1)+      * 23 is invalid code
+0000110E  22FC 00001248             80          MOVE.L #SUB,(A1)+      * 24 is SUB
+00001114                            81          
+00001114  5049                      82          ADDA.W #8,A1           * should put us at TREE + $6C
+00001116  22FC 000012F4             83          MOVE.L #AND,(A1)+      * node 27 is AND
+0000111C  22FC 00001302             84          MOVE.L #ADD,(A1)+      * node 28 is ADD
+00001122  22FC 0000139C             85          MOVE.L #TESTBIT,(A1)+  * 29 is a decision node
+00001128  22FC 00001202             86          MOVE.L #BAD,(A1)+      * 30 is invalid code, puts us at TREE + $7C
+0000112E                            87          
+0000112E  D2FC 0030                 88          ADDA.W #$30,A1         * go to TREE + $AC which is node 43
+00001132  22FC 0000139C             89          MOVE.L #TESTBIT,(A1)+  * 43 is decision node
+00001138  22BC 0000139C             90          MOVE.L #TESTBIT,(A1)   * 44 is decision node, should be B0
+0000113E                            91          
+0000113E  D2FC 003C                 92          ADDA.W #$3C,A1         * should put us at TREE + $EC
+00001142  22FC 0000139C             93          MOVE.L #TESTBIT,(A1)+  * node 59 is decision
+00001148  22BC 00001202             94          MOVE.L #BAD,(A1)       * node 60 is invalid code
+0000114E                            95          
+0000114E  D2FC 006C                 96          ADDA.W #$6C,A1         * should put us at TREE + $15C
+00001152  22FC 00001310             97          MOVE.L #BRA,(A1)+      * node 87 is BRA
+00001158  22FC 0000131E             98          MOVE.L #BEQ,(A1)+      * node 88 is BEQ
+0000115E  22FC 00001202             99          MOVE.L #BAD,(A1)+      * node 89 is an invalid code
+00001164  22BC 0000139C            100          MOVE.L #TESTBIT,(A1)   * node 90 is a decision node
+0000116A                           101          
+0000116A  D2FC 0074                102          ADDA.W #$74,A1         * should put us at TREE + $DC?
+0000116E  22FC 0000139C            103          MOVE.L #TESTBIT,(A1)+  * nodes 119,120 are decision nodes
+00001174  22BC 0000139C            104          MOVE.L #TESTBIT,(A1)   * A1= TREE + $1E0?
+0000117A                           105          
+0000117A  D2FC 00F4                106          ADDA.W #$F4,A1         * puts us at TREE + $2D4?
+0000117E  22FC 00001202            107          MOVE.L #BAD,(A1)+      * node 181 is an invalid code
+00001184  22BC 0000139C            108          MOVE.L #TESTBIT,(A1)   * node 182 is a decision node
+0000118A                           109          
+0000118A  D2FC 00E4                110          ADDA.W #$E4,A1
+0000118E  22FC 0000139C            111          MOVE.L #TESTBIT,(A1)+  * node 239 is a deicsion node
+00001194  22FC 0000139C            112          MOVE.L #TESTBIT,(A1)+  * node 240 is a deicsion node
+0000119A  22FC 00001202            113          MOVE.L #BAD,(A1)+      * node 241 is an invalid code
+000011A0  22BC 0000139C            114          MOVE.L #TESTBIT,(A1)   * node 242 is a deicsion node
+000011A6                           115          
+000011A6  D2FC 01EC                116          ADDA.W #$1EC,A1
+000011AA  22FC 0000132C            117          MOVE.L #BGT,(A1)+      * node 365 is BGT
+000011B0  22BC 0000133A            118          MOVE.L #BLE,(A1)       * node 366 is BLE
+000011B6                           119          
+000011B6  D2FC 01C4                120          ADDA.W #$1C4,A1
+000011BA  22FC 00001348            121          MOVE.L #ASR,(A1)+      * node 479 is ASR
+000011C0  22FC 00001356            122          MOVE.L #ASL,(A1)+      * node 480 is ASL
+000011C6  22FC 00001364            123          MOVE.L #LSR,(A1)+      * node 481 is LSR
+000011CC  22BC 00001372            124          MOVE.L #LSL,(A1)       * node 482 is LSL
+000011D2                           125          
+000011D2  D2FC 000C                126          ADDA.W #$C,A1
+000011D6  22FC 00001380            127          MOVE.L #ROR,(A1)+      * node 485 is ROR
+000011DC  22BC 0000138E            128          MOVE.L #ROL,(A1)       * node 486 is ROL
+000011E2                           129          
+000011E2  4E75                     130          RTS
+000011E4                           131      
+000011E4  143C 000F                132  DECODE_OP MOVE.B #$F,D2 * decodes the opcode at A4
+000011E8  2A79 000013D4            133            MOVEA.L TREE,A5
+000011EE  2255                     134            MOVEA.L (A5),A1
+000011F0  4E91                     135            JSR (A1)
+000011F2  4E75                     136            RTS    
+000011F4                           137      
+000011F4  43F9 00001451            138  UNDEF LEA UNDEFINED,A1
+000011FA  103C 000E                139        MOVE.B #14,D0
+000011FE  4E4F                     140        TRAP #15
+00001200  4E75                     141        RTS 
+00001202                           142        
+00001202  43F9 0000147C            143  BAD   LEA BADDATA,A1
+00001208  103C 000E                144        MOVE.B #14,D0
+0000120C  4E4F                     145        TRAP #15
+0000120E  4E75                     146        RTS
+00001210                           147        
+00001210  43F9 000014B2            148  MOVEB  LEA MB,A1
+00001216  103C 000E                149         MOVE.B #14,D0
+0000121A  4E4F                     150         TRAP #15
+0000121C  4E75                     151         RTS 
+0000121E                           152        
+0000121E  43F9 000014AB            153  MOVEQ LEA MQ,A1
+00001224  103C 000E                154         MOVE.B #14,D0
+00001228  4E4F                     155         TRAP #15
+0000122A  4E75                     156         RTS
+0000122C                           157         
+0000122C  43F9 000014BA            158  MOVEL LEA ML,A1
+00001232  103C 000E                159        MOVE.B #14,D0
+00001236  4E4F                     160        TRAP #15
+00001238  4E75                     161        RTS
+0000123A                           162        
+0000123A  43F9 000014CA            163  MOVEW LEA MW,A1
+00001240  103C 000E                164        MOVE.B #14,D0
+00001244  4E4F                     165        TRAP #15
+00001246  4E75                     166        RTS
+00001248                           167        
+00001248  43F9 0000152A            168  SUB   LEA SB,A1
+0000124E  103C 000E                169         MOVE.B #14,D0
+00001252  4E4F                     170         TRAP #15
+00001254  4E75                     171         RTS      
+00001256                           172        
+00001256  2614                     173  NOPETC MOVE.L (A4),D3
+00001258  E19B                     174         ROL.L #8,D3
+0000125A  B63C 0046                175         CMP.B #$46,D3
+0000125E  6700 0040                176         BEQ NOT
+00001262                           177         
+00001262  2614                     178         MOVE.L (A4),D3
+00001264  0803 0007                179         BTST.L #7,D3
+00001268  6700 0044                180         BEQ LEA * this is around where the problem is
+0000126C  0503                     181         BTST.L D2,D3 * is this the correct bit? should be since testbit iterates..
+0000126E  6692                     182         BNE BAD
+00001270  E19B                     183         ROL.L #8,D3
+00001272  E59B                     184         ROL.L #2,D3
+00001274  0243 03FF                185         ANDI.W #$03FF,D3
+00001278  B67C 013A                186         CMP.W #$013A,D3
+0000127C  6700 003E                187         BEQ JSR
+00001280                           188         
+00001280  2614                     189         MOVE.L (A4),D3
+00001282  E19B                     190         ROL.L #8,D3
+00001284  ED9B                     191         ROL.L #6,D3
+00001286  0243 3FFF                192         ANDI #$3FFF,D3
+0000128A  B67C 139B                193         CMP.W #$139B,D3
+0000128E  6700 003A                194         BEQ RTS
+00001292  B67C 139A                195         CMP.W #$139A,D3
+00001296  6700 0040                196         BEQ NOP
+0000129A  6000 FF66                197         BRA BAD
+0000129E  4E75                     198         RTS
+000012A0                           199         
+000012A0  43F9 000014DF            200  NOT    LEA NT,A1
+000012A6  103C 000E                201         MOVE.B #14,D0
+000012AA  4E4F                     202         TRAP #15
+000012AC  4E75                     203         RTS     
+000012AE                           204  
+000012AE  43F9 00001511            205  LEA    LEA LA,A1
+000012B4  103C 000E                206         MOVE.B #14,D0
+000012B8  4E4F                     207         TRAP #15
+000012BA  4E75                     208         RTS
+000012BC                           209  
+000012BC  43F9 0000152F            210  JSR    LEA JS,A1
+000012C2  103C 000E                211         MOVE.B #14,D0
+000012C6  4E4F                     212         TRAP #15
+000012C8  4E75                     213         RTS
+000012CA  43F9 00001534            214  RTS    LEA RT,A1
+000012D0  103C 000E                215         MOVE.B #14,D0
+000012D4  4E4F                     216         TRAP #15
+000012D6  4E75                     217         RTS
+000012D8                           218  
+000012D8  43F9 000014DA            219  NOP    LEA NP,A1
+000012DE  103C 000E                220         MOVE.B #14,D0
+000012E2  4E4F                     221         TRAP #15
+000012E4  4E75                     222         RTS   
+000012E6                           223         
+000012E6  43F9 000014E3            224  ADDQ   LEA AQ,A1
+000012EC  103C 000E                225         MOVE.B #14,D0
+000012F0  4E4F                     226         TRAP #15
+000012F2  4E75                     227         RTS
+000012F4                           228  
+000012F4  43F9 000014E9            229  AND    LEA AN,A1
+000012FA  103C 000E                230         MOVE.B #14,D0
+000012FE  4E4F                     231         TRAP #15
+00001300  4E75                     232         RTS
+00001302                           233         
+00001302  43F9 000014EE            234  ADD    LEA AD,A1
+00001308  103C 000E                235         MOVE.B #14,D0
+0000130C  4E4F                     236         TRAP #15
+0000130E  4E75                     237         RTS
+00001310                           238  
+00001310  43F9 000014F3            239  BRA   LEA BR,A1
+00001316  103C 000E                240        MOVE.B #14,D0
+0000131A  4E4F                     241        TRAP #15
+0000131C  4E75                     242        RTS
+0000131E                           243  
+0000131E  43F9 000014F8            244  BEQ   LEA BE,A1
+00001324  103C 000E                245         MOVE.B #14,D0
+00001328  4E4F                     246         TRAP #15
+0000132A  4E75                     247         RTS
+0000132C                           248         
+0000132C  43F9 000014FD            249  BGT   LEA BG,A1
+00001332  103C 000E                250         MOVE.B #14,D0
+00001336  4E4F                     251         TRAP #15
+00001338  4E75                     252         RTS
+0000133A                           253         
+0000133A  43F9 00001502            254  BLE   LEA BL,A1
+00001340  103C 000E                255         MOVE.B #14,D0
+00001344  4E4F                     256         TRAP #15
+00001346  4E75                     257         RTS
+00001348                           258         
+00001348  43F9 00001507            259  ASR   LEA AR,A1
+0000134E  103C 000E                260         MOVE.B #14,D0
+00001352  4E4F                     261         TRAP #15
+00001354  4E75                     262         RTS
+00001356                           263         
+00001356  43F9 0000150C            264  ASL   LEA AL,A1
+0000135C  103C 000E                265         MOVE.B #14,D0
+00001360  4E4F                     266         TRAP #15
+00001362  4E75                     267         RTS
+00001364                           268         
+00001364  43F9 00001516            269  LSR   LEA LR,A1
+0000136A  103C 000E                270         MOVE.B #14,D0
+0000136E  4E4F                     271         TRAP #15
+00001370  4E75                     272         RTS
+00001372                           273         
+00001372  43F9 0000151B            274  LSL   LEA LL,A1
+00001378  103C 000E                275         MOVE.B #14,D0
+0000137C  4E4F                     276         TRAP #15
+0000137E  4E75                     277         RTS
+00001380                           278         
+00001380  43F9 00001520            279  ROR   LEA RR,A1
+00001386  103C 000E                280         MOVE.B #14,D0
+0000138A  4E4F                     281         TRAP #15
+0000138C  4E75                     282         RTS
+0000138E                           283         
+0000138E  43F9 00001525            284  ROL   LEA RL,A1
+00001394  103C 000E                285         MOVE.B #14,D0
+00001398  4E4F                     286         TRAP #15
+0000139A  4E75                     287         RTS
+0000139C                           288  
+0000139C                           289  TESTBIT
+0000139C  3614                     290      MOVE.W (A4),D3
+0000139E  220D                     291      MOVE.L A5,D1
+000013A0  92B9 000013D4            292      SUB.L TREE,D1
+000013A6  E381                     293      ASL.L #1,D1
+000013A8  2A41                     294      MOVEA.L D1,A5
+000013AA  0503                     295      BTST.L D2,D3
+000013AC  6700 0006                296      BEQ IS_ZERO
+000013B0  6000 0012                297      BRA NOT_ZERO
+000013B4                           298      
+000013B4                           299  IS_ZERO   * if bit D2 of (A4) is zero (go left on tree)
+000013B4  5342                     300      SUBQ #1,D2
+000013B6  584D                     301      ADDA.W #4,A5
+000013B8  DBF9 000013D4            302      ADDA.L TREE,A5
+000013BE  2255                     303      MOVEA.L (A5),A1
+000013C0  4E91                     304      JSR (A1)
+000013C2  4E75                     305      RTS
+000013C4                           306  
+000013C4                           307  NOT_ZERO  * if bit D2 of (A4) is one (go right on tree)
+000013C4  5342                     308      SUBQ #1,D2
+000013C6  504D                     309      ADDA.W #8,A5
+000013C8  DBF9 000013D4            310      ADDA.L TREE,A5
+000013CE  2255                     311      MOVEA.L (A5),A1
+000013D0  4E91                     312      JSR (A1)
+000013D2  4E75                     313      RTS
+000013D4                           314      
+000013D4                           315  * var storage
+000013D4= 00007000                 316  TREE DC.L $7000    
+000013D8                           317  * string storage
+000013D8  =0000000D                318  CR EQU $0D
+000013D8  =00000009                319  LF EQU $09
+000013D8= 0D 09 00                 320  NEWLINE DC.B '',CR,LF,0
+000013DB= 50 6C 65 61 73 65 ...    321  PROMPT1  DC.B  'Please enter the memory value of the start of the program: ',0
+00001417= 50 6C 65 61 73 65 ...    322  PROMPT2  DC.B  'Please enter the memory value of the end of the program: ',0
+00001451= 54 68 65 20 70 72 ...    323  UNDEFINED DC.B 'The program should never reach this state.',0
+0000147C= 54 68 65 20 64 61 ...    324  BADDATA  DC.B 'The data on line ____ is not a valid opcode.',CR,LF,0
+000014AB= 4D 4F 56 45 51 20 00     325  MQ DC.B 'MOVEQ ',0
+000014B2= 4D 4F 56 45 2E 42 ...    326  MB  DC.B 'MOVE.B ',0
+000014BA= 4D 4F 56 45 2E 4C ...    327  ML  DC.B 'MOVE.L/MOVEA.L ',0
+000014CA= 4D 4F 56 45 2E 57 ...    328  MW  DC.B 'MOVE.W/MOVEA.W ',0
+000014DA= 4E 4F 50 20 00           329  NP DC.B 'NOP ',0
+000014DF= 4E 4F 54 00              330  NT DC.B 'NOT',0
+000014E3= 41 44 44 51 20 00        331  AQ DC.B 'ADDQ ',0
+000014E9= 41 4E 44 20 00           332  AN DC.B 'AND ',0
+000014EE= 41 44 44 20 00           333  AD DC.B 'ADD ',0
+000014F3= 42 52 41 20 00           334  BR DC.B 'BRA ',0
+000014F8= 42 45 51 20 00           335  BE DC.B 'BEQ ',0
+000014FD= 42 47 54 20 00           336  BG DC.B 'BGT ',0
+00001502= 42 4C 45 20 00           337  BL DC.B 'BLE ',0
+00001507= 41 53 52 20 00           338  AR DC.B 'ASR ',0
+0000150C= 41 53 4C 20 00           339  AL DC.B 'ASL ',0
+00001511= 4C 45 41 20 00           340  LA DC.B 'LEA ',0
+00001516= 4C 53 52 20 00           341  LR DC.B 'LSR ',0
+0000151B= 4C 53 4C 20 00           342  LL DC.B 'LSL ',0
+00001520= 52 4F 52 20 00           343  RR DC.B 'ROR ',0
+00001525= 52 4F 4C 20 00           344  RL DC.B 'ROL ',0
+0000152A= 53 55 42 20 00           345  SB DC.B 'SUB ',0
+0000152F= 4A 53 52 20 00           346  JS DC.B 'JSR ',0
+00001534= 52 54 53 20 00           347  RT DC.B 'RTS ',0
+00001539                           348  
+00001539                           349      END    START
 
 No errors detected
 No warnings generated
@@ -323,64 +359,70 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-AD                  1487
-ADD                 129E
-ADDQ                1282
-AL                  14A5
-AN                  1482
-AND                 1290
-AQ                  147C
-AR                  14A0
-ASL                 12F2
-ASR                 12E4
-BAD                 11F6
-BADDATA             1415
-BE                  1491
-BEQ                 12BA
-BG                  1496
-BGT                 12C8
-BL                  149B
-BLDLOOP             105E
-BLE                 12D6
-BR                  148C
-BRA                 12AC
-BUILDTREE           1054
+AD                  14EE
+ADD                 1302
+ADDQ                12E6
+AL                  150C
+AN                  14E9
+AND                 12F4
+AQ                  14E3
+AR                  1507
+ASL                 1356
+ASR                 1348
+BAD                 1202
+BADDATA             147C
+BE                  14F8
+BEQ                 131E
+BG                  14FD
+BGT                 132C
+BL                  1502
+BLDLOOP             106A
+BLE                 133A
+BR                  14F3
+BRA                 1310
+BUILDTREE           1060
 CR                  D
-DECODE_OP           11D8
-DONE                1024
-IS_ZERO             1350
-LA                  14AA
-LEA                 1274
+DECODE_OP           11E4
+DONE                1030
+IS_ZERO             13B4
+JS                  152F
+JSR                 12BC
+LA                  1511
+LEA                 12AE
 LF                  9
-LL                  14B4
-LR                  14AF
-LSL                 130E
-LSR                 1300
-MB                  144B
-ML                  1453
-MOVEB               1204
-MOVEL               1220
-MOVEQ               1212
-MOVEW               122E
-MQ                  1444
-MW                  1463
+LL                  151B
+LR                  1516
+LSL                 1372
+LSR                 1364
+MB                  14B2
+ML                  14BA
+MOVEB               1210
+MOVEL               122C
+MOVEQ               121E
+MOVEW               123A
+MQ                  14AB
+MW                  14CA
+NEWLINE             13D8
 NEXTLINE            1014
-NOPETC              124A
-NOT                 1266
-NOT_ZERO            1360
-NP                  1473
-NT                  1478
-PROMPT1             1374
-PROMPT2             13B0
-RL                  14BE
-ROL                 132A
-ROR                 131C
-RR                  14B9
-SB                  14C3
+NOP                 12D8
+NOPETC              1256
+NOT                 12A0
+NOT_ZERO            13C4
+NP                  14DA
+NT                  14DF
+PROMPT1             13DB
+PROMPT2             1417
+RL                  1525
+ROL                 138E
+ROR                 1380
+RR                  1520
+RT                  1534
+RTS                 12CA
+SB                  152A
 START               1000
-SUB                 123C
-TESTBIT             1338
-TREE                1370
-UNDEF               11E8
-UNDEFINED           13EA
-WELCOME             102A
+SUB                 1248
+TESTBIT             139C
+TREE                13D4
+UNDEF               11F4
+UNDEFINED           1451
+WELCOME             1036

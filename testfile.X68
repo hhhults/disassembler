@@ -7,13 +7,19 @@
     ORG    $5000
 START:                  ; first instruction of program
 
-    *MOVE.B #$FF,D1
+    NOT D0
     NOP
+    LEA DONE,A1
+    JSR DONE
     SIMHALT             ; halt simulator
 
+
+DONE MOVE.B #$F,D0
+     RTS           
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 

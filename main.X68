@@ -17,6 +17,9 @@ NEXTLINE JSR DECODE_OP
          CMP.L A4,A3
          BEQ DONE
          ADDA.W #2,A4
+         LEA NEWLINE,A1
+         MOVE.B #13,D0
+         TRAP #15
          BRA NEXTLINE
 
 
@@ -174,9 +177,24 @@ NOPETC MOVE.L (A4),D3
        
        MOVE.L (A4),D3
        BTST.L #7,D3
-       BNE LEA * this is around where the problem is
-       BTST.L D2,D3
-       BEQ BAD
+       BEQ LEA * this is around where the problem is
+       BTST.L D2,D3 * is this the correct bit? should be since testbit iterates..
+       BNE BAD
+       ROL.L #8,D3
+       ROL.L #2,D3
+       ANDI.W #$03FF,D3
+       CMP.W #$013A,D3
+       BEQ JSR
+       
+       MOVE.L (A4),D3
+       ROL.L #8,D3
+       ROL.L #6,D3
+       ANDI #$3FFF,D3
+       CMP.W #$139B,D3
+       BEQ RTS
+       CMP.W #$139A,D3
+       BEQ NOP
+       BRA BAD
        RTS
        
 NOT    LEA NT,A1
@@ -187,7 +205,21 @@ NOT    LEA NT,A1
 LEA    LEA LA,A1
        MOVE.B #14,D0
        TRAP #15
-       RTS       
+       RTS
+
+JSR    LEA JS,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS
+RTS    LEA RT,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS
+
+NOP    LEA NP,A1
+       MOVE.B #14,D0
+       TRAP #15
+       RTS   
        
 ADDQ   LEA AQ,A1
        MOVE.B #14,D0
@@ -285,6 +317,7 @@ TREE DC.L $7000
 * string storage
 CR EQU $0D
 LF EQU $09
+NEWLINE DC.B '',CR,LF,0
 PROMPT1  DC.B  'Please enter the memory value of the start of the program: ',0
 PROMPT2  DC.B  'Please enter the memory value of the end of the program: ',0
 UNDEFINED DC.B 'The program should never reach this state.',0
@@ -310,8 +343,11 @@ LL DC.B 'LSL ',0
 RR DC.B 'ROR ',0
 RL DC.B 'ROL ',0
 SB DC.B 'SUB ',0
+JS DC.B 'JSR ',0
+RT DC.B 'RTS ',0
 
     END    START
+
 
 
 

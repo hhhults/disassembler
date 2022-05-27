@@ -1,34 +1,79 @@
 00005000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 5/26/2022 2:41:28 PM
+Created On: 5/27/2022 4:04:18 PM
 
-00000000                             1  *-----------------------------------------------------------
-00000000                             2  * Title      :test file
-00000000                             3  * Written by :Harper Hults
-00000000                             4  * Date       :5/23
-00000000                             5  * Description:has a couple instructions to load into memory for the disassembler
-00000000                             6  *-----------------------------------------------------------
-00005000                             7      ORG    $5000
-00005000                             8  START:   
-00005000  4640                       9      NOT.W D0
-00005002  45F9 00005008             10      LEA BOOB,A2
-00005008                            11      
-00005008= 62 6F 6F 62 73 00         12  BOOB DC.B 'boobs',0
-0000500E                            13      
-0000500E                            14  DONE
-0000500E  FFFF FFFF                 15      SIMHALT             ; halt simulator
-00005012                            16  
-00005012                            17  * Put variables and constants here
-00005012                            18  
-00005012                            19      END    START        ; last line of source
+Line 1 ERROR: Illegal symbol
+00000000                             1  00005000 Starting Address
+Line 2 ERROR: Invalid syntax
+00000000                             2  Assembler used: EASy68K Editor/Assembler v5.16.01
+Line 3 ERROR: Invalid syntax
+00000000                             3  Created On: 5/27/2022 4:01:25 PM
+00000000                             4  
+Line 5 ERROR: Illegal symbol
+00000000                             5  00000000                             1  *-----------------------------------------------------------
+Line 6 ERROR: Illegal symbol
+00000000                             6  00000000                             2  * Title      :test file
+Line 7 ERROR: Illegal symbol
+00000000                             7  00000000                             3  * Written by :Harper Hults
+Line 8 ERROR: Illegal symbol
+00000000                             8  00000000                             4  * Date       :5/23
+Line 9 ERROR: Illegal symbol
+00000000                             9  00000000                             5  * Description:has a couple instructions to load into memory for the disassembler
+Line 10 ERROR: Illegal symbol
+00000000                            10  00000000                             6  *-----------------------------------------------------------
+Line 11 ERROR: Illegal symbol
+00000000                            11  00005000                             7      ORG    $5000
+Line 12 ERROR: Illegal symbol
+00000000                            12  00005000                             8  START:                  ; first instruction of program
+Line 13 ERROR: Illegal symbol
+00000000                            13  00005000                             9  
+Line 14 ERROR: Illegal symbol
+00000000                            14  00005000  4640                      10      NOT D0
+Line 15 ERROR: Illegal symbol
+00000000                            15  00005002  4E71                      11      NOP
+Line 16 ERROR: Illegal symbol
+00000000                            16  00005004  43F9 00005014             12      LEA DONE,A1
+Line 17 ERROR: Illegal symbol
+00000000                            17  0000500A  4EB9 00005014             13      JSR DONE
+Line 18 ERROR: Illegal symbol
+00000000                            18  00005010  FFFF FFFF                 14      SIMHALT             ; halt simulator
+Line 19 ERROR: Illegal symbol
+00000000                            19  00005014                            15  
+Line 20 ERROR: Illegal symbol
+00000000                            20  00005014                            16  
+Line 21 ERROR: Illegal symbol
+00000000                            21  00005014  103C 000F                 17  DONE MOVE.B #$F,D0
+Line 22 ERROR: Illegal symbol
+00000000                            22  00005018  4E75                      18       RTS           
+Line 23 ERROR: Illegal symbol
+00000000                            23  0000501A                            19  * Put variables and constants here
+Line 24 ERROR: Illegal symbol
+00000000                            24  0000501A                            20  
+Line 25 ERROR: Illegal symbol
+00000000                            25  0000501A                            21      END    START        ; last line of source
+00000000                            26  
+Line 27 ERROR: Invalid opcode
+00000000                            27  No errors detected
+Line 28 ERROR: Invalid opcode
+00000000                            28  No warnings generated
+00000000                            29  
+00000000                            30  
+Line 31 ERROR: Invalid opcode
+00000000                            31  SYMBOL TABLE INFORMATION
+Line 32 ERROR: Invalid opcode
+00000000                            32  Symbol-name         Value
+Line 33 ERROR: Illegal symbol
+00000000                            33  -------------------------
+Line 34 ERROR: Invalid opcode
+00000000                            34  DONE                5014
+Line 35 ERROR: Invalid opcode
+00000000                            35  START               5000
+Line 36 WARNING: END directive missing, starting address not set
 
-No errors detected
-No warnings generated
+31 errors detected
+1 warning generated
 
 
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-BOOB                5008
-DONE                500E
-START               5000
