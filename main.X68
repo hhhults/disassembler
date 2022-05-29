@@ -32,16 +32,16 @@ WELCOME
     LEA PROMPT1,A1  * get start memory value, put in A2
     MOVE.B #14,D0
     TRAP #15
-    MOVE.B #4,D0
-    TRAP #15
-    MOVEA.L D1,A2
+    
+    JSR GETINPUT
+    MOVE.L D3,BEGIN
     
     LEA PROMPT2,A1  * get end memory value, put in D3
     MOVE.B #14,D0
     TRAP #15
-    MOVE.B #4,D0
-    TRAP #15
-    MOVEA.L D1,A3
+    
+    JSR GETINPUT
+    MOVE.L D3,END
     RTS
     
 BUILDTREE
@@ -477,7 +477,16 @@ MOVEQ LEA MQ,A1     ;CHANGE OPCODE SOURCE ANANLYSIS CODE************************
        
       RTS
        
-MOVEL LEA ML,A1         ;FIGURE OUT HOW TO DEAL WITH THE MOVEQ BUG *****************
+MOVEL 
+      MOVE.L (A4),D3
+      ROL.L #8,D3
+      ROL.L #2,D3
+      ANDI.B #$07,D3
+      CMP.B #1,D3
+      BEQ MOVEAL
+      
+      LEA ML,A1         ;FIGURE OUT HOW TO DEAL WITH THE MOVEQ BUG *****************
+BREAK      
       MOVE.B #14,D0
       TRAP #15
       
@@ -486,12 +495,27 @@ MOVEL LEA ML,A1         ;FIGURE OUT HOW TO DEAL WITH THE MOVEQ BUG *************
       
       RTS
       
-MOVEW LEA MW,A1
+MOVEAL LEA MAL,A1
+       BRA BREAK
+      
+MOVEW 
+      MOVE.L (A4),D3
+      ROL.L #8,D3
+      ROL.L #2,D3
+      ANDI.B #$07,D3
+      CMP.B #1,D3
+      BEQ MOVEAW
+      
+      LEA MW,A1
+BREAK2
       MOVE.B #14,D0
       TRAP #15
       JSR   CHK_EA_SOURCE
       JSR   CHK_EA_DEST
       RTS
+
+MOVEAW LEA MAW,A1
+       BRA BREAK2
       
 SUB   LEA SB,A1
        MOVE.B #14,D0
@@ -502,16 +526,16 @@ SUB   LEA SB,A1
        
        RTS      
       
-NOPETC MOVE.L (A4),D3   ; NOT WORKING RN***************************************
+NOPETC MOVE.L (A4),D3
        ROL.L #8,D3
        CMP.B #$46,D3
        BEQ NOT
        
        MOVE.L (A4),D3
-       BTST.L #8,D3
-       BEQ LEA * this is around where the problem is************************
-       BTST.L D2,D3 * is this the correct bit? should be since testbit iterates..
-       BNE BAD
+       BTST.L #$18,D3
+       BNE LEA 
+       BTST.L D2,D3 
+       BEQ BAD
        ROL.L #8,D3
        ROL.L #2,D3
        ANDI.W #$03FF,D3
@@ -522,9 +546,9 @@ NOPETC MOVE.L (A4),D3   ; NOT WORKING RN***************************************
        ROL.L #8,D3
        ROL.L #6,D3
        ANDI #$3FFF,D3
-       CMP.W #$139B,D3
+       CMP.W #$139D,D3
        BEQ RTS
-       CMP.W #$139A,D3
+       CMP.W #$139C,D3
        BEQ NOP
        BRA BAD
        RTS
@@ -647,10 +671,38 @@ NOT_ZERO  * if bit D2 of (A4) is one (go right on tree)
     MOVEA.L (A5),A1
     JSR (A1)
     RTS
+
+* ----------------------------------------------------------
+* GETINPUT: gets hex value in ascii from user, puts it in D3   
+GETINPUT 
+       MOVE.B #2,D0     * get user string
+       TRAP   #15      
+
+LOOP1  LSL.L  #4,D3       * get single char from string
+       MOVE.B (A1)+,D2
+       SUBI   #1,D1
+       BRA HEXVAL       
+       
+HEXVAL CMPI.B #$39,D2     * convert ascii char value to hex
+       BGT.B  LETTER
+       SUBI.B #$30,D2
+       BRA    WRITE
+    
+LETTER SUBI.B #$37,D2
+       BRA    WRITE
+    
+WRITE                     * write hex val to D3
+    ADD.B D2,D3
+    CMPI.B #0,D1
+    BNE    LOOP1
+    RTS
+    
     
 * var storage
 TREE DC.L $7000  
 EA_TREE DC.L    $0500  
+BEGIN DS.L $FFFF
+END   DS.L $FFFF
 * string storage
 CR EQU $0D
 LF EQU $09
@@ -661,8 +713,10 @@ UNDEFINED DC.B 'The program should never reach this state.',0
 BADDATA  DC.B 'The data on line ____ is not a valid opcode.',CR,LF,0
 MQ DC.B 'MOVEQ ',0
 MB  DC.B 'MOVE.B ',0
-ML  DC.B 'MOVE.L/MOVEA.L ',0
-MW  DC.B 'MOVE.W/MOVEA.W ',0
+MAL DC.B 'MOVEA.L ',0
+MAW DC.B 'MOVEA.W ',0
+ML  DC.B 'MOVE.L ',0
+MW  DC.B 'MOVE.W ',0
 NP DC.B 'NOP ',0
 NT DC.B 'NOT',0
 AQ DC.B 'ADDQ ',0
@@ -702,6 +756,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
     END    START
+
 
 
 
