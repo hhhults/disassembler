@@ -8,7 +8,7 @@
 START:
     *JSR WELCOME
     MOVEA.L #$5000,A2    * for testing
-    MOVEA.L #$500E,A3
+    MOVEA.L #$501E,A3
     MOVEA.L #$00000500,A5
     MOVEA.L  A2,A4      * does this need to be W depending on where in mem start is?
     JSR BUILD_EA_TREE
@@ -32,16 +32,16 @@ WELCOME
     LEA PROMPT1,A1  * get start memory value, put in A2
     MOVE.B #14,D0
     TRAP #15
-    
-    JSR GETINPUT
-    MOVE.L D3,BEGIN
+    MOVE.B #4,D0
+    TRAP #15
+    MOVEA.L D1,A2
     
     LEA PROMPT2,A1  * get end memory value, put in D3
     MOVE.B #14,D0
     TRAP #15
-    
-    JSR GETINPUT
-    MOVE.L D3,END
+    MOVE.B #4,D0
+    TRAP #15
+    MOVEA.L D1,A3
     RTS
     
 BUILDTREE
@@ -215,12 +215,42 @@ CHK_EA_DEST       ;COMPARES A DESTINATION MODE FROM THE OPCODE TO THE EA TREE
             MOVEA.L (A5),A6
             JSR     (A6)
             
+            RTS      
+*-----------------------------------------------------------
+IS_ABS_IMM      ;COMPARES REGISTER NUMBER FOR ABSOLUTES AND IMMEDIATES FOR PRINTING
+            CMP     #9,D6
+            BEQ     IS_DEST
+            
+            MOVE.W  D3,D5
+            ANDI.W  #$0007,D5
+            BRA     IS_SOURCE                        
+IS_DEST                        
+            MOVE.W  D3,D5
+            ANDI.W  #$0E00,D5
+            ROL.W   #$07,D5
+IS_SOURCE
+            ADDQ    #$4,D5
+            MULU.W  #$04,D5
+            ADD.L   EA_TREE,D5
+            
+            MOVEA.L D5,A5
+            MOVEA.L (A5),A6
+            JSR     (A6)
+            
+            CMP     #9,D6
+            BEQ     RTS
+            
+            LEA     P_COMMA,A1
+            MOVE    #14,D0
+            TRAP    #15
+            
             RTS
 *-----------------------------------------------------------            
-MATH_DEST_CHK
+LOGIC_DEST_CHK
             CLR.L   D5
             CLR.L   D6
             MOVE.W  D3,D5
+            
             
 *-----------------------------------------------------------            
 LOGIC_SIZE_CHK      ;CHECKS AND PRINTS SIZE (.L/.W/.B) FOR ADD/AND/SUB/ADDA/OR
@@ -272,36 +302,7 @@ LOGIC_DONE
             LEA     P_SPACE,A1
             MOVE    #14,D0
             TRAP    #15 
-            RTS                 
-*-----------------------------------------------------------
-IS_ABS_IMM      ;COMPARES REGISTER NUMBER FOR ABSOLUTES AND IMMEDIATES FOR PRINTING
-            CMP     #9,D6
-            BEQ     IS_DEST
-            
-            MOVE.W  D3,D5
-            ANDI.W  #$0007,D5
-            BRA     IS_SOURCE                        
-IS_DEST                        
-            MOVE.W  D3,D5
-            ANDI.W  #$0E00,D5
-            ROL.W   #$07,D5
-IS_SOURCE
-            ADDQ    #$4,D5
-            MULU.W  #$04,D5
-            ADD.L   EA_TREE,D5
-            
-            MOVEA.L D5,A5
-            MOVEA.L (A5),A6
-            JSR     (A6)
-            
-            CMP     #9,D6
-            BEQ     RTS
-            
-            LEA     P_COMMA,A1
-            MOVE    #14,D0
-            TRAP    #15
-            
-            RTS
+            RTS      
 *-----------------------------------------------------------    
 M_DR    ;IF MODE IS A DATA REGISTER Dn
             
@@ -477,16 +478,7 @@ MOVEQ LEA MQ,A1     ;CHANGE OPCODE SOURCE ANANLYSIS CODE************************
        
       RTS
        
-MOVEL 
-      MOVE.L (A4),D3
-      ROL.L #8,D3
-      ROL.L #2,D3
-      ANDI.B #$07,D3
-      CMP.B #1,D3
-      BEQ MOVEAL
-      
-      LEA ML,A1         ;FIGURE OUT HOW TO DEAL WITH THE MOVEQ BUG *****************
-BREAK      
+MOVEL LEA ML,A1         ;FIGURE OUT HOW TO DEAL WITH THE MOVEQ BUG *****************
       MOVE.B #14,D0
       TRAP #15
       
@@ -495,29 +487,14 @@ BREAK
       
       RTS
       
-MOVEAL LEA MAL,A1
-       BRA BREAK
-      
-MOVEW 
-      MOVE.L (A4),D3
-      ROL.L #8,D3
-      ROL.L #2,D3
-      ANDI.B #$07,D3
-      CMP.B #1,D3
-      BEQ MOVEAW
-      
-      LEA MW,A1
-BREAK2
+MOVEW LEA MW,A1
       MOVE.B #14,D0
       TRAP #15
       JSR   CHK_EA_SOURCE
       JSR   CHK_EA_DEST
       RTS
-
-MOVEAW LEA MAW,A1
-       BRA BREAK2
       
-SUB   LEA SB,A1
+SUB    LEA SB,A1
        MOVE.B #14,D0
        TRAP #15
        
@@ -526,16 +503,16 @@ SUB   LEA SB,A1
        
        RTS      
       
-NOPETC MOVE.L (A4),D3
+NOPETC MOVE.L (A4),D3   ; NOT WORKING RN***************************************
        ROL.L #8,D3
        CMP.B #$46,D3
        BEQ NOT
        
        MOVE.L (A4),D3
-       BTST.L #$18,D3
-       BNE LEA 
-       BTST.L D2,D3 
-       BEQ BAD
+       BTST.L #8,D3
+       BEQ LEA * this is around where the problem is************************
+       BTST.L D2,D3 * is this the correct bit? should be since testbit iterates..
+       BNE BAD
        ROL.L #8,D3
        ROL.L #2,D3
        ANDI.W #$03FF,D3
@@ -546,9 +523,9 @@ NOPETC MOVE.L (A4),D3
        ROL.L #8,D3
        ROL.L #6,D3
        ANDI #$3FFF,D3
-       CMP.W #$139D,D3
+       CMP.W #$139B,D3
        BEQ RTS
-       CMP.W #$139C,D3
+       CMP.W #$139A,D3
        BEQ NOP
        BRA BAD
        RTS
@@ -671,38 +648,10 @@ NOT_ZERO  * if bit D2 of (A4) is one (go right on tree)
     MOVEA.L (A5),A1
     JSR (A1)
     RTS
-
-* ----------------------------------------------------------
-* GETINPUT: gets hex value in ascii from user, puts it in D3   
-GETINPUT 
-       MOVE.B #2,D0     * get user string
-       TRAP   #15      
-
-LOOP1  LSL.L  #4,D3       * get single char from string
-       MOVE.B (A1)+,D2
-       SUBI   #1,D1
-       BRA HEXVAL       
-       
-HEXVAL CMPI.B #$39,D2     * convert ascii char value to hex
-       BGT.B  LETTER
-       SUBI.B #$30,D2
-       BRA    WRITE
-    
-LETTER SUBI.B #$37,D2
-       BRA    WRITE
-    
-WRITE                     * write hex val to D3
-    ADD.B D2,D3
-    CMPI.B #0,D1
-    BNE    LOOP1
-    RTS
-    
     
 * var storage
 TREE DC.L $7000  
 EA_TREE DC.L    $0500  
-BEGIN DS.L $FFFF
-END   DS.L $FFFF
 * string storage
 CR EQU $0D
 LF EQU $09
@@ -711,31 +660,29 @@ PROMPT1  DC.B  'Please enter the memory value of the start of the program: ',0
 PROMPT2  DC.B  'Please enter the memory value of the end of the program: ',0
 UNDEFINED DC.B 'The program should never reach this state.',0
 BADDATA  DC.B 'The data on line ____ is not a valid opcode.',CR,LF,0
-MQ DC.B 'MOVEQ ',0
-MB  DC.B 'MOVE.B ',0
-MAL DC.B 'MOVEA.L ',0
-MAW DC.B 'MOVEA.W ',0
-ML  DC.B 'MOVE.L ',0
-MW  DC.B 'MOVE.W ',0
-NP DC.B 'NOP ',0
+MQ DC.B 'MOVEQ',0
+MB  DC.B 'MOVE.B',0
+ML  DC.B 'MOVE.L/MOVEA.L',0
+MW  DC.B 'MOVE.W/MOVEA.W',0
+NP DC.B 'NOP',0
 NT DC.B 'NOT',0
-AQ DC.B 'ADDQ ',0
-AN DC.B 'AND ',0
-AD DC.B 'ADD ',0
-BR DC.B 'BRA ',0
-BE DC.B 'BEQ ',0
-BG DC.B 'BGT ',0
-BL DC.B 'BLE ',0
-AR DC.B 'ASR ',0
-AL DC.B 'ASL ',0
-LA DC.B 'LEA ',0
-LR DC.B 'LSR ',0
-LL DC.B 'LSL ',0
-RR DC.B 'ROR ',0
-RL DC.B 'ROL ',0
-SB DC.B 'SUB ',0
-JS DC.B 'JSR ',0
-RT DC.B 'RTS ',0
+AQ DC.B 'ADDQ',0
+AN DC.B 'AND',0
+AD DC.B 'ADD',0
+BR DC.B 'BRA',0
+BE DC.B 'BEQ',0
+BG DC.B 'BGT',0
+BL DC.B 'BLE',0
+AR DC.B 'ASR',0
+AL DC.B 'ASL',0
+LA DC.B 'LEA',0
+LR DC.B 'LSR',0
+LL DC.B 'LSL',0
+RR DC.B 'ROR',0
+RL DC.B 'ROL',0
+SB DC.B 'SUB',0
+JS DC.B 'JSR',0
+RT DC.B 'RTS',0
 
 ;necessary symbols for displaying EA's
 P_D         DC.B    'D',0
