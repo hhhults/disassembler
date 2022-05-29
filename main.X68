@@ -8,19 +8,19 @@
 START:
     *JSR WELCOME
     MOVEA.L #$5000,A2    * for testing
-    MOVEA.L #$5020,A3
+    MOVEA.L #$500E,A3
     MOVEA.L #$00000500,A5
     MOVEA.L  A2,A4      * does this need to be W depending on where in mem start is?
     JSR BUILD_EA_TREE
     JSR BUILDTREE
     
+    
 NEXTLINE JSR DECODE_OP
          CMP.L A4,A3
-         BEQ DONE
-         ADDA.W #2,A4
-         LEA NEWLINE,A1
-         MOVE.B #13,D0
-         TRAP #15
+         BLE DONE
+         LEA     NXT_LINE,A1
+         MOVE    #13,D0
+         TRAP    #15
          BRA NEXTLINE
 
 
@@ -148,6 +148,7 @@ BUILD_EA_TREE   ;BUILDS THE BINARY EA TREE FOR COMPARISONS
             ;ABSOLUTE AND IMMEDIATE ADDED TO ARRAY           
             MOVE.L  #M_AWA,(A5)+
             MOVE.L  #M_ALA,(A5)+
+            MOVE.L  #$00000000,(A5)+
             MOVE.L  #M_IA,(A5)+
             RTS            
 *-----------------------------------------------------------          
@@ -155,7 +156,7 @@ CHK_EA_SOURCE     ;COMPARES A SOURCE MODE FROM THE OPCODE TO THE EA TREE
     
             CLR.L   D6
             MOVE.L  A4,D6
-            ADDQ    #$4,D6
+            ADDQ    #$2,D6
             MOVEA.L D6,A4
             
             LEA     P_SPACE,A1
@@ -164,7 +165,7 @@ CHK_EA_SOURCE     ;COMPARES A SOURCE MODE FROM THE OPCODE TO THE EA TREE
                
             CLR.L   D5
             MOVE.W  D3,D5 
-            ANDI.W  #$0028,D5
+            ANDI.W  #$0038,D5
             LSR.W   #$3,D5
             
             CLR.L   D6
@@ -172,7 +173,7 @@ CHK_EA_SOURCE     ;COMPARES A SOURCE MODE FROM THE OPCODE TO THE EA TREE
             BEQ     IS_ABS_IMM            
             
             MULU.W  #$4,D5
-            ADDI.W  #$0500,D5
+            ADD.L   EA_TREE,D5
             MOVEA.L D5,A5
            
             CLR.L   D1
@@ -203,7 +204,7 @@ CHK_EA_DEST       ;COMPARES A DESTINATION MODE FROM THE OPCODE TO THE EA TREE
             BEQ     IS_ABS_IMM            
             
             MULU.W  #$4,D5
-            ADDI.W  #$0500,D5
+            ADD.L   EA_TREE,D5
             MOVEA.L D5,A5
             
             CLR.L   D1
@@ -214,31 +215,93 @@ CHK_EA_DEST       ;COMPARES A DESTINATION MODE FROM THE OPCODE TO THE EA TREE
             MOVEA.L (A5),A6
             JSR     (A6)
             
-            LEA     NXT_LINE,A1
+            RTS
+*-----------------------------------------------------------            
+MATH_DEST_CHK
+            CLR.L   D5
+            CLR.L   D6
+            MOVE.W  D3,D5
+            
+*-----------------------------------------------------------            
+LOGIC_SIZE_CHK      ;CHECKS AND PRINTS SIZE (.L/.W/.B) FOR ADD/AND/SUB/ADDA/OR
+            CLR.L   D5
+            MOVE.W  D3,D5
+            ANDI.W  #$00C0,D5
+            LSR.W   #$06,D5 
+            
+            CMP     #00,D5
+            BEQ     LOGIC_BYTE            
+            CMP     #01,D5
+            BEQ     LOGIC_WORD           
+            CMP     #02,D5
+            BEQ     LOGIC_LONG  
+            CMP     #03,D5
+            BEQ     LOGIC_A          
+            BRA     LOGIC_DONE
+LOGIC_BYTE  ;IF THE INSTRICTION IS BYTE SIZED
+            LEA     P_PERIOD,A1
+            MOVE.B  #14,D0
+            TRAP    #15            
+            LEA     P_B,A1
+            MOVE.B  #14,D0
+            TRAP    #15            
+            BRA     LOGIC_DONE
+LOGIC_WORD  ;IF THE INSTRICTION IS WORD SIZED
+            LEA     P_PERIOD,A1
+            MOVE.B  #14,D0
+            TRAP    #15            
+            LEA     P_W,A1
+            MOVE.B  #14,D0
+            TRAP    #15            
+            BRA     LOGIC_DONE
+LOGIC_LONG    ;IF THE INSTRICTION IS LONG-WORD SIZED
+            LEA     P_PERIOD,A1
+            MOVE.B  #14,D0
+            TRAP    #15            
+            LEA     P_L,A1
+            MOVE.B  #14,D0
+            TRAP    #15  
+LOGIC_A     ;IF THE INSTRUCTION IS ADDA, PRINTS THE A
+            LEA     P_A,A1
+            MOVE.B  #14,D0
+            TRAP    #15                        
+            BTST    #$8,D5
+            BEQ     LOGIC_WORD
+            BRA     LOGIC_LONG                                 
+LOGIC_DONE
+            LEA     P_SPACE,A1
+            MOVE    #14,D0
+            TRAP    #15 
+            RTS                 
+*-----------------------------------------------------------
+IS_ABS_IMM      ;COMPARES REGISTER NUMBER FOR ABSOLUTES AND IMMEDIATES FOR PRINTING
+            CMP     #9,D6
+            BEQ     IS_DEST
+            
+            MOVE.W  D3,D5
+            ANDI.W  #$0007,D5
+            BRA     IS_SOURCE                        
+IS_DEST                        
+            MOVE.W  D3,D5
+            ANDI.W  #$0E00,D5
+            ROL.W   #$07,D5
+IS_SOURCE
+            ADDQ    #$4,D5
+            MULU.W  #$04,D5
+            ADD.L   EA_TREE,D5
+            
+            MOVEA.L D5,A5
+            MOVEA.L (A5),A6
+            JSR     (A6)
+            
+            CMP     #9,D6
+            BEQ     RTS
+            
+            LEA     P_COMMA,A1
             MOVE    #14,D0
             TRAP    #15
             
             RTS
-*-----------------------------------------------------------
-IS_ABS_IMM      ;COMPARES 
-;            CMP     #9,D6
-;            BNE     IS_DEST
-;            
-;            LEA     P_HASH,A1
-;            MOVE.B  #14,D0    
-;            TRAP    #15 
-;            
-;IS_DEST            
-            BTST    D6,D3
-            BNE     M_ALA
-            ADDQ    #2,D6
-
-            BTST    D6,D3
-            BNE     M_IA
-            SUBQ    #1,D6
-            
-            BTST    D6,D3
-            BEQ     M_AWA
 *-----------------------------------------------------------    
 M_DR    ;IF MODE IS A DATA REGISTER Dn
             
@@ -396,14 +459,25 @@ BAD   LEA BADDATA,A1
 MOVEB  LEA MB,A1
        MOVE.B #14,D0
        TRAP #15
+       
+       JSR   CHK_EA_SOURCE
+       JSR   CHK_EA_DEST
+       
        RTS 
       
-MOVEQ LEA MQ,A1
-       MOVE.B #14,D0
-       TRAP #15
-       RTS
+MOVEQ LEA MQ,A1     ;CHANGE OPCODE SOURCE ANANLYSIS CODE*************************
+      MOVE.B #14,D0
+      TRAP #15
        
-MOVEL LEA ML,A1
+      CLR.L     D5
+      MOVE.W    D3,D5
+      ADDI.W    #$0F,D5
+      
+      JSR       CHK_EA_DEST
+       
+      RTS
+       
+MOVEL LEA ML,A1         ;FIGURE OUT HOW TO DEAL WITH THE MOVEQ BUG *****************
       MOVE.B #14,D0
       TRAP #15
       
@@ -415,21 +489,27 @@ MOVEL LEA ML,A1
 MOVEW LEA MW,A1
       MOVE.B #14,D0
       TRAP #15
+      JSR   CHK_EA_SOURCE
+      JSR   CHK_EA_DEST
       RTS
       
 SUB   LEA SB,A1
        MOVE.B #14,D0
        TRAP #15
+       
+       JSR  LOGIC_SIZE_CHK
+       JSR  CHK_EA_SOURCE
+       
        RTS      
       
-NOPETC MOVE.L (A4),D3
+NOPETC MOVE.L (A4),D3   ; NOT WORKING RN***************************************
        ROL.L #8,D3
        CMP.B #$46,D3
        BEQ NOT
        
        MOVE.L (A4),D3
        BTST.L #8,D3
-       BEQ LEA * this is around where the problem is
+       BEQ LEA * this is around where the problem is************************
        BTST.L D2,D3 * is this the correct bit? should be since testbit iterates..
        BNE BAD
        ROL.L #8,D3
@@ -449,26 +529,28 @@ NOPETC MOVE.L (A4),D3
        BRA BAD
        RTS
        
-NOT    LEA NT,A1
+NOT    LEA NT,A1        ;DONE, NEEDS TESTING *********************************
        MOVE.B #14,D0
        TRAP #15
+       JSR  LOGIC_SIZE_CHK
+       JSR  CHK_EA_SOURCE
        RTS     
 
-LEA    LEA LA,A1
+LEA    LEA LA,A1        ;NOT WORKING RN*******************************************
        MOVE.B #14,D0
        TRAP #15
        RTS
 
-JSR    LEA JS,A1
+JSR    LEA JS,A1        ;NOT WORKING RN************************************
        MOVE.B #14,D0
        TRAP #15
        RTS
-RTS    LEA RT,A1
+RTS    LEA RT,A1       ;NOT WORKING RN*********************************
        MOVE.B #14,D0
        TRAP #15
        RTS
 
-NOP    LEA NP,A1
+NOP    LEA NP,A1       ;NOT WORKING RN*********************************
        MOVE.B #14,D0
        TRAP #15
        RTS   
@@ -486,6 +568,8 @@ AND    LEA AN,A1
 ADD    LEA AD,A1
        MOVE.B #14,D0
        TRAP #15
+       JSR  LOGIC_SIZE_CHK
+       JSR  CHK_EA_SOURCE
        RTS
 
 BRA   LEA BR,A1
@@ -602,6 +686,10 @@ RT DC.B 'RTS ',0
 ;necessary symbols for displaying EA's
 P_D         DC.B    'D',0
 P_A         DC.B    'A',0
+P_B         DC.B    'B',0
+P_W         DC.B    'W',0
+P_L         DC.B    'L',0
+P_PERIOD    DC.B    '.',0
 P_OPEN_PAR  DC.B    '(',0
 P_CLOSE_PAR DC.B    ')',0
 P_PLUS      DC.B    '+',0
@@ -611,9 +699,12 @@ P_HEX       DC.B    '$',0
 P_BINARY    DC.B    '%',0
 P_COMMA     DC.B    ',',0
 P_SPACE     DC.B    ' ',0
-NXT_LINE    DC.B    CR,LF,0
+NXT_LINE    DC.B    '',CR,LF,0
 
     END    START
+
+
+
 
 
 
