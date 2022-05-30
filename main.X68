@@ -6,53 +6,54 @@
 *-----------------------------------------------------------
     ORG    $1000
 START:
-    *JSR WELCOME
-    MOVEA.L #$5000,A2    * for testing
-    MOVEA.L #$500F,A3
-    MOVEA.L #$00000500,A5
-    MOVEA.L  A2,A4      * does this need to be W depending on where in mem start is?
-    JSR BUILD_EA_TREE
-    JSR BUILDTREE
+        *JSR        WELCOME
+        MOVEA.L     #$5000,A2    * for testing
+        MOVEA.L     #$500F,A3
+        MOVEA.L     #$00000500,A5
+        MOVEA.L     A2,A4      * does this need to be W depending on where in mem start is?
+        JSR         BUILD_EA_TREE
+        JSR         BUILDTREE
     
     
-NEXTLINE JSR DECODE_OP
-         CMP.L A4,A3
-         BLE DONE
-         LEA     NXT_LINE,A1
-         MOVE    #13,D0
-         TRAP    #15
-         BRA NEXTLINE
+NEXTLINE 
+        JSR         DECODE_OP
+        CMP.L       A4,A3
+        BLE         DONE
+        LEA         NXT_LINE,A1
+        MOVE        #13,D0
+        TRAP        #15
+        BRA         NEXTLINE
 
 
 DONE                * end program
-    MOVE.B  #9,D0
-    TRAP    #15
+        MOVE.B      #9,D0
+        TRAP        #15
     
 WELCOME
-    LEA PROMPT1,A1  * get start memory value, put in A2
-    MOVE.B #14,D0
-    TRAP #15
+        LEA         PROMPT1,A1  * get start memory value, put in A2
+        MOVE.B      #14,D0
+        TRAP        #15
     
-    JSR GETINPUT
-    MOVE.L D3,BEGIN
+        JSR         GETINPUT
+        MOVE.L      D3,BEGIN
     
-    LEA PROMPT2,A1  * get end memory value, put in D3
-    MOVE.B #14,D0
-    TRAP #15
+        LEA         PROMPT2,A1  * get end memory value, put in D3
+        MOVE.B      #14,D0
+        TRAP        #15
     
-    JSR GETINPUT
-    MOVE.L D3,END
-    RTS
+        JSR         GETINPUT
+        MOVE.L      D3,END
+        RTS
     
 BUILDTREE
-        MOVE.W #0,D0
-        MOVEA.L TREE,A1
-BLDLOOP MOVE.L #UNDEF,(A1)+    * initialize whole tree to undefined
-        ADDQ #1,D0
-        CMP.W #513,D0
-        BNE BLDLOOP
+        MOVE.W      #0,D0
+        MOVEA.L     TREE,A1
+BLDLOOP MOVE.L      #UNDEF,(A1)+    * initialize whole tree to undefined
+        ADDQ        #1,D0
+        CMP.W       #513,D0
+        BNE         BLDLOOP
         
-        MOVEA.L TREE,A1
+        MOVEA.L     TREE,A1
 
         MOVE.L #TESTBIT,(A1)+  * nodes 0 - 11 are decision nodes
         MOVE.L #TESTBIT,(A1)+
@@ -130,11 +131,12 @@ BLDLOOP MOVE.L #UNDEF,(A1)+    * initialize whole tree to undefined
         
         RTS
     
-DECODE_OP MOVE.B #$F,D2 * decodes the opcode at A4
-          MOVEA.L TREE,A5
-          MOVEA.L (A5),A1
-          JSR (A1)
-          RTS    
+DECODE_OP 
+        MOVE.B      #$F,D2 * decodes the opcode at A4
+        MOVEA.L     TREE,A5
+        MOVEA.L     (A5),A1
+        JSR         (A1)
+        RTS    
 *-----------------------------------------------------------
 *EA STUFF STARTS HERE
 *-----------------------------------------------------------
@@ -697,95 +699,95 @@ ROL    LEA      RL,A1
        RTS
 
 TESTBIT
-        MOVE.W (A4),D3
-        MOVE.L A5,D1
-    SUB.L TREE,D1
-    ASL.L #1,D1
-    MOVEA.L D1,A5
-    BTST.L D2,D3
-    BEQ IS_ZERO
-    BRA NOT_ZERO
+       MOVE.W   (A4),D3
+       MOVE.L   A5,D1
+       SUB.L    TREE,D1
+       ASL.L    #1,D1
+       MOVEA.L  D1,A5
+       BTST.L   D2,D3
+       BEQ      IS_ZERO
+       BRA      NOT_ZERO
     
 IS_ZERO   * if bit D2 of (A4) is zero (go left on tree)
-    SUBQ #1,D2
-    ADDA.W #4,A5
-    ADDA.L TREE,A5
-    MOVEA.L (A5),A1
-    JSR (A1)
-    RTS
+       SUBQ     #1,D2
+       ADDA.W   #4,A5
+       ADDA.L   TREE,A5
+       MOVEA.L  (A5),A1
+       JSR      (A1)
+       RTS
 
 NOT_ZERO  * if bit D2 of (A4) is one (go right on tree)
-    SUBQ #1,D2
-    ADDA.W #8,A5
-    ADDA.L TREE,A5
-    MOVEA.L (A5),A1
-    JSR (A1)
-    RTS
+       SUBQ     #1,D2
+       ADDA.W   #8,A5
+       ADDA.L   TREE,A5
+       MOVEA.L  (A5),A1
+       JSR      (A1)
+       RTS
     
 * ----------------------------------------------------------
 * GETINPUT: gets hex value in ascii from user, puts it in D3   
 GETINPUT 
-       MOVE.B #2,D0     * get user string
-       TRAP   #15      
+       MOVE.B   #2,D0     * get user string
+       TRAP     #15      
 
-LOOP1  LSL.L  #4,D3       * get single char from string
-       MOVE.B (A1)+,D2
-       SUBI   #1,D1
-       BRA HEXVAL       
+LOOP1  LSL.L    #4,D3       * get single char from string
+       MOVE.B   (A1)+,D2
+       SUBI     #1,D1
+       BRA      HEXVAL       
        
-HEXVAL CMPI.B #$39,D2     * convert ascii char value to hex
-       BGT.B  LETTER
-       SUBI.B #$30,D2
-       BRA    WRITE
+HEXVAL CMPI.B   #$39,D2     * convert ascii char value to hex
+       BGT.B    LETTER
+       SUBI.B   #$30,D2
+       BRA      WRITE
     
-LETTER SUBI.B #$37,D2
-       BRA    WRITE
+LETTER SUBI.B   #$37,D2
+       BRA      WRITE
     
 WRITE                     * write hex val to D3
-    ADD.B D2,D3
-    CMPI.B #0,D1
-    BNE    LOOP1
-    RTS
+       ADD.B    D2,D3
+       CMPI.B   #0,D1
+       BNE      LOOP1
+       RTS
 
     
 * var storage
-TREE DC.L $7000  
-EA_TREE DC.L    $0500
-BEGIN DS.L $FFFF
-END   DS.L $FFFF  
+TREE        DC.L    $7000  
+EA_TREE     DC.L    $0500
+BEGIN       DS.L    $FFFF
+END         DS.L    $FFFF  
 * string storage
-CR EQU $0D
-LF EQU $09
-NEWLINE DC.B '',CR,LF,0
-PROMPT1  DC.B  'Please enter the memory value of the start of the program: ',0
-PROMPT2  DC.B  'Please enter the memory value of the end of the program: ',0
-UNDEFINED DC.B 'The program should never reach this state.',0
-BADDATA  DC.B 'The data on line ____ is not a valid opcode.',CR,LF,0
-MQ DC.B 'MOVEQ ',0
-MB  DC.B 'MOVE.B ',0
-MAL DC.B 'MOVEA.L ',0
-MAW DC.B 'MOVEA.W ',0
-ML  DC.B 'MOVE.L ',0
-MW  DC.B 'MOVE.W ',0
-NP DC.B 'NOP',0
-NT DC.B 'NOT',0
-AQ DC.B 'ADDQ ',0
-AN DC.B 'AND',0
-AD DC.B 'ADD',0
-BR DC.B 'BRA ',0
-BE DC.B 'BEQ ',0
-BG DC.B 'BGT ',0
-BL DC.B 'BLE ',0
-AR DC.B 'ASR',0
-AL DC.B 'ASL',0
-LA DC.B 'LEA',0
-LR DC.B 'LSR',0
-LL DC.B 'LSL',0
-RR DC.B 'ROR',0
-RL DC.B 'ROL',0
-SB DC.B 'SUB',0
-JS DC.B 'JSR ',0
-RT DC.B 'RTS',0
+CR          EQU     $0D
+LF          EQU     $09
+NEWLINE     DC.B    '',CR,LF,0
+PROMPT1     DC.B    'Please enter the memory value of the start of the program: ',0
+PROMPT2     DC.B    'Please enter the memory value of the end of the program: ',0
+UNDEFINED   DC.B  'The program should never reach this state.',0
+BADDATA     DC.B    'The data on line ____ is not a valid opcode.',CR,LF,0
+MQ          DC.B    'MOVEQ ',0
+MB          DC.B    'MOVE.B ',0
+MAL         DC.B    'MOVEA.L ',0
+MAW         DC.B    'MOVEA.W ',0
+ML          DC.B    'MOVE.L ',0
+MW          DC.B    'MOVE.W ',0
+NP          DC.B    'NOP',0
+NT          DC.B    'NOT',0
+AQ          DC.B    'ADDQ ',0
+AN          DC.B    'AND',0
+AD          DC.B    'ADD',0
+BR          DC.B    'BRA ',0
+BE          DC.B    'BEQ ',0
+BG          DC.B    'BGT ',0
+BL          DC.B    'BLE ',0
+AR          DC.B    'ASR',0
+AL          DC.B    'ASL',0
+LA          DC.B    'LEA',0
+LR          DC.B    'LSR',0
+LL          DC.B    'LSL',0
+RR          DC.B    'ROR',0
+RL          DC.B    'ROL',0
+SB          DC.B    'SUB',0
+JS          DC.B    'JSR ',0
+RT          DC.B    'RTS',0
 
 ;necessary symbols for displaying EA's
 P_D         DC.B    'D',0
@@ -805,7 +807,7 @@ P_COMMA     DC.B    ',',0
 P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
-    END    START
+            END     START
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
