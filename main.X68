@@ -673,8 +673,7 @@ AND
        MOVE.B   #14,D0
        TRAP     #15       
        JSR      LOGIC_SIZE_CHK
-       JSR      LOGIC_PARAMETER_CHK
-       
+       JSR      LOGIC_PARAMETER_CHK  
        RTS
 *-----------------------------------------------------------       
 ADD    
