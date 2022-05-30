@@ -157,11 +157,7 @@ CHK_EA_SOURCE     ;COMPARES A SOURCE MODE FROM THE OPCODE TO THE EA TREE
             CLR.L   D6
             MOVE.L  A4,D6
             ADDQ    #$2,D6
-            MOVEA.L D6,A4
-            
-            LEA     P_SPACE,A1
-            MOVE    #14,D0
-            TRAP    #15   
+            MOVEA.L D6,A4  
                
             CLR.L   D5
             MOVE.W  D3,D5 
@@ -182,10 +178,6 @@ CHK_EA_SOURCE     ;COMPARES A SOURCE MODE FROM THE OPCODE TO THE EA TREE
                         
             MOVEA.L (A5),A6
             JSR     (A6)    
-            
-            LEA     P_COMMA,A1
-            MOVE    #14,D0
-            TRAP    #15
             
             CLR.L   D5
 
@@ -248,9 +240,9 @@ IS_SOURCE
 *-----------------------------------------------------------            
 LOGIC_DEST_CHK
             CLR.L   D5
-            CLR.L   D6
             MOVE.W  D3,D5
             BTST    #$09,D5
+            BNE     LOGIC_TOEA
             
 LOGIC_TOREG
             
@@ -258,7 +250,7 @@ LOGIC_TOEA
             
             
 *-----------------------------------------------------------            
-LOGIC_SIZE_CHK      ;CHECKS AND PRINTS SIZE (.L/.W/.B) FOR ADD/AND/SUB/ADDA/OR
+LOGIC_SIZE_CHK      ;CHECKS AND PRINTS SIZE (.L/.W/.B) FOR ADD/AND/SUB/ADDA/OR/NOT
             CLR.L   D5
             MOVE.W  D3,D5
             ANDI.W  #$00C0,D5
@@ -453,218 +445,260 @@ M_AWA   ;IF MODE IS AN ABSOLUTE WORD ADDRESS (xxx).W
 
             RTS            
 *----------------------------------------------------------- 
-UNDEF LEA UNDEFINED,A1
-      MOVE.B #14,D0
-      TRAP #15
-      RTS 
+UNDEF  LEA      UNDEFINED,A1
+       MOVE.B   #14,D0
+       TRAP     #15
+       RTS 
       
-BAD   LEA BADDATA,A1
-      MOVE.B #14,D0
-      TRAP #15
-      ADD.L #$2,A4
-      RTS
+BAD    LEA      BADDATA,A1
+       MOVE.B   #14,D0
+       TRAP     #15
+       ADD.L    #$2,A4
+       RTS
       
-MOVEB  LEA MB,A1
-       MOVE.B #14,D0
-       TRAP #15
+MOVEB  LEA      MB,A1
+       MOVE.B   #14,D0
+       TRAP     #15
        
-       JSR   CHK_EA_SOURCE
-       JSR   CHK_EA_DEST
+       JSR      CHK_EA_SOURCE
+       LEA      P_COMMA,A1
+       MOVE     #14,D0
+       TRAP     #15
+       JSR      CHK_EA_DEST
        
        RTS 
       
-MOVEQ LEA MQ,A1     
-      MOVE.B #14,D0
-      TRAP #15
+MOVEQ  LEA      MQ,A1     
+       MOVE.B   #14,D0
+       TRAP     #15
        
-      CLR.L     D5
-      MOVE.W    D3,D5
-      ADDI.W    #$0F,D5
-      MOVE.W    D5,D1
-      MOVE.B    #3,D0
-      TRAP      #15
+       CLR.L    D5
+       MOVE.W   D3,D5
+       ADDI.W   #$0F,D5
+       MOVE.W   D5,D1
+       MOVE.B   #3,D0
+       TRAP     #15
       
-      LEA     P_COMMA,A1
-      MOVE    #14,D0
-      TRAP    #15         
-      JSR       CHK_EA_DEST
+       LEA      P_COMMA,A1
+       MOVE     #14,D0
+       TRAP     #15         
+       JSR      CHK_EA_DEST
        
-      RTS
+       RTS
        
 MOVEL 
-      CLR.L D5
-      MOVE.W D3,D5
-      ANDI.W #$01C0,D5
-      LSR.W #$06,D5
-      CMP.B #1,D5
-      BEQ MOVEAL
+       CLR.L    D5
+       MOVE.W   D3,D5
+       ANDI.W   #$01C0,D5
+       LSR.W    #$06,D5
+       CMP.B    #1,D5
+       BEQ      MOVEAL
       
-      LEA ML,A1        
+       LEA      ML,A1        
 BREAK      
-      MOVE.B #14,D0
-      TRAP #15
-      CLR.L   D3
-      MOVE.W (A4),D3
-      JSR   CHK_EA_SOURCE
-      JSR   CHK_EA_DEST
+       MOVE.B   #14,D0
+       TRAP     #15
+       CLR.L    D3
+       MOVE.W   (A4),D3
+       JSR      CHK_EA_SOURCE
+       LEA      P_COMMA,A1
+       MOVE     #14,D0
+       TRAP     #15
+       JSR      CHK_EA_DEST
       
-      RTS
+       RTS
       
-MOVEAL LEA MAL,A1
-       BRA BREAK
+MOVEAL LEA      MAL,A1
+       BRA      BREAK
       
 MOVEW 
-      CLR.L D5
-      MOVE.W D3,D5
-      ANDI.W #$01C0,D5
-      LSR.W #$06,D5
-      CMP.B #1,D5
-      BEQ MOVEAW
+       CLR.L    D5
+       MOVE.W   D3,D5
+       ANDI.W   #$01C0,D5
+       LSR.W    #$06,D5
+       CMP.B    #1,D5
+       BEQ      MOVEAW
       
-      LEA MW,A1
+       LEA      MW,A1
 BREAK2
-      MOVE.B #14,D0
-      TRAP #15
-      JSR   CHK_EA_SOURCE
-      JSR   CHK_EA_DEST
-      RTS
+       MOVE.B   #14,D0
+       TRAP     #15
+       JSR      CHK_EA_SOURCE
+       LEA      P_COMMA,A1
+       MOVE     #14,D0
+       TRAP     #15
+       JSR      CHK_EA_DEST
+       RTS
 
-MOVEAW LEA MAW,A1
-       BRA BREAK2
+MOVEAW LEA      MAW,A1
+       BRA      BREAK2
 
       
-SUB    LEA SB,A1
-       MOVE.B #14,D0
-       TRAP #15
+SUB    LEA      SB,A1
+       MOVE.B   #14,D0
+       TRAP     #15
        
-       JSR  LOGIC_SIZE_CHK
-       JSR  CHK_EA_SOURCE
+       JSR      LOGIC_SIZE_CHK
+       
        
        RTS      
       
-NOPETC MOVE.L (A4),D3
-       ROL.L #8,D3
-       CMP.B #$46,D3
-       BEQ NOT
+NOPETC MOVE.L   (A4),D3
+       ROL.L    #8,D3
+       CMP.B    #$46,D3
+       BEQ      NOT
        
-       MOVE.L (A4),D3
-       BTST.L #$18,D3
-       BNE LEA 
-       BTST.L D2,D3 
-       BEQ BAD
-       ROL.L #8,D3
-       ROL.L #2,D3
-       ANDI.W #$03FF,D3
-       CMP.W #$013A,D3
-       BEQ JSR
+       MOVE.L   (A4),D3
+       BTST.L   #$18,D3
+       BNE      LEA 
+       BTST.L   D2,D3 
+       BEQ      BAD
+       ROL.L    #8,D3
+       ROL.L    #2,D3
+       ANDI.W   #$03FF,D3
+       CMP.W    #$013A,D3
+       BEQ      JSR
        
-       MOVE.L (A4),D3
-       ROL.L #8,D3
-       ROL.L #6,D3
-       ANDI #$3FFF,D3
-       CMP.W #$139D,D3
-       BEQ RTS
-       CMP.W #$139C,D3
-       BEQ NOP
-       BRA BAD
+       MOVE.L   (A4),D3
+       ROL.L    #8,D3
+       ROL.L    #6,D3
+       ANDI     #$3FFF,D3
+       CMP.W    #$139D,D3
+       BEQ      RTS
+       CMP.W    #$139C,D3
+       BEQ      NOP
+       BRA      BAD
        RTS
        
-NOT    LEA NT,A1        ;DONE, NEEDS TESTING *********************************
-       MOVE.B #14,D0
-       TRAP #15
-       JSR  LOGIC_SIZE_CHK
-       JSR  CHK_EA_SOURCE
+NOT    LEA      NT,A1        ;DONE, NEEDS TESTING *********************************
+       MOVE.B   #14,D0
+       TRAP     #15
+       JSR      LOGIC_SIZE_CHK
+       JSR      CHK_EA_SOURCE
        RTS     
 
-LEA    LEA LA,A1        ;NOT WORKING RN*******************************************
-       MOVE.B #14,D0
-       TRAP #15
+LEA    LEA      LA,A1        ;NOT WORKING RN*******************************************
+       MOVE.B   #14,D0
+       TRAP     #15
        RTS
 
-JSR    LEA JS,A1        ;NOT WORKING RN************************************
-       MOVE.B #14,D0
-       TRAP #15
+JSR    LEA      JS,A1        ;NOT WORKING RN************************************
+       MOVE.B   #14,D0
+       TRAP     #15
        RTS
-RTS    LEA RT,A1       ;NOT WORKING RN*********************************
-       MOVE.B #14,D0
-       TRAP #15
+       
+RTS    LEA      RT,A1       ;NOT WORKING RN*********************************
+       MOVE.B   #14,D0
+       TRAP     #15
        RTS
 
-NOP    LEA NP,A1       ;NOT WORKING RN*********************************
-       MOVE.B #14,D0
-       TRAP #15
+NOP    LEA      NP,A1       ;NOT WORKING RN*********************************
+       MOVE.B   #14,D0
+       TRAP     #15
        RTS   
        
-ADDQ   LEA AQ,A1
-       MOVE.B #14,D0
-       TRAP #15
+ADDQ   LEA      AQ,A1
+       MOVE.B   #14,D0
+       TRAP     #15
+       
+       CLR.L    D5
+       MOVE.W   D3,D5
+       ANDI.W   #$0E00,D5
+       ROL.W    #$07,D5
+       MOVE.W   D5,D1
+
+       LEA      P_HASH,A1
+       MOVE.B   #14,D0    
+       TRAP     #15 
+          
+       LEA      P_HEX,A1
+       MOVE.B   #14,D0    
+       TRAP     #15
+       
+       MOVE.B   #3,D0
+       TRAP     #15
+       
+       LEA      P_COMMA,A1
+       MOVE     #14,D0
+       TRAP     #15
+
+       JSR      CHK_EA_SOURCE
+       
        RTS
 
-AND    LEA AN,A1
-       MOVE.B #14,D0
-       TRAP #15
+AND    LEA      AN,A1
+       MOVE.B   #14,D0
+       TRAP     #15
+       
+       JSR      LOGIC_SIZE_CHK
+       
+       
        RTS
        
-ADD    LEA AD,A1
-       MOVE.B #14,D0
-       TRAP #15
-       JSR  LOGIC_SIZE_CHK
-       JSR  CHK_EA_SOURCE
+ADD    LEA      AD,A1
+       MOVE.B   #14,D0
+       TRAP     #15
+       JSR      LOGIC_SIZE_CHK
+       CLR.L    D5
+       MOVE.W   D3,D5
+       BTST     #$09,D5
+       
+       JSR      CHK_EA_SOURCE
        RTS
 
-BRA   LEA BR,A1
-      MOVE.B #14,D0
-      TRAP #15
-      RTS
+BRA    LEA      BR,A1
+       MOVE.B   #14,D0
+       TRAP     #15
+       RTS
 
-BEQ   LEA BE,A1
-       MOVE.B #14,D0
-       TRAP #15
+BEQ    LEA      BE,A1
+       MOVE.B   #14,D0
+       TRAP     #15
        RTS
        
-BGT   LEA BG,A1
-       MOVE.B #14,D0
-       TRAP #15
+BGT    LEA      BG,A1
+       MOVE.B   #14,D0
+       TRAP     #15
        RTS
        
-BLE   LEA BL,A1
-       MOVE.B #14,D0
-       TRAP #15
+BLE    LEA      BL,A1
+       MOVE.B   #14,D0
+       TRAP     #15
        RTS
        
-ASR   LEA AR,A1
-       MOVE.B #14,D0
-       TRAP #15
+ASR    LEA      AR,A1
+       MOVE.B   #14,D0
+       TRAP     #15
        RTS
        
-ASL   LEA AL,A1
-       MOVE.B #14,D0
-       TRAP #15
+ASL    LEA      AL,A1
+       MOVE.B   #14,D0
+       TRAP     #15
        RTS
        
-LSR   LEA LR,A1
-       MOVE.B #14,D0
-       TRAP #15
+LSR    LEA      LR,A1
+       MOVE.B   #14,D0
+       TRAP     #15
        RTS
        
-LSL   LEA LL,A1
-       MOVE.B #14,D0
-       TRAP #15
+LSL    LEA      LL,A1
+       MOVE.B   #14,D0
+       TRAP     #15
        RTS
        
-ROR   LEA RR,A1
-       MOVE.B #14,D0
-       TRAP #15
+ROR    LEA      RR,A1
+       MOVE.B   #14,D0
+       TRAP     #15
        RTS
        
-ROL   LEA RL,A1
-       MOVE.B #14,D0
-       TRAP #15
+ROL    LEA      RL,A1
+       MOVE.B   #14,D0
+       TRAP     #15
        RTS
 
 TESTBIT
-    MOVE.W (A4),D3
-    MOVE.L A5,D1
+        MOVE.W (A4),D3
+        MOVE.L A5,D1
     SUB.L TREE,D1
     ASL.L #1,D1
     MOVEA.L D1,A5
@@ -735,13 +769,13 @@ ML  DC.B 'MOVE.L ',0
 MW  DC.B 'MOVE.W ',0
 NP DC.B 'NOP',0
 NT DC.B 'NOT',0
-AQ DC.B 'ADDQ',0
+AQ DC.B 'ADDQ ',0
 AN DC.B 'AND',0
 AD DC.B 'ADD',0
-BR DC.B 'BRA',0
-BE DC.B 'BEQ',0
-BG DC.B 'BGT',0
-BL DC.B 'BLE',0
+BR DC.B 'BRA ',0
+BE DC.B 'BEQ ',0
+BG DC.B 'BGT ',0
+BL DC.B 'BLE ',0
 AR DC.B 'ASR',0
 AL DC.B 'ASL',0
 LA DC.B 'LEA',0
@@ -750,7 +784,7 @@ LL DC.B 'LSL',0
 RR DC.B 'ROR',0
 RL DC.B 'ROL',0
 SB DC.B 'SUB',0
-JS DC.B 'JSR',0
+JS DC.B 'JSR ',0
 RT DC.B 'RTS',0
 
 ;necessary symbols for displaying EA's
