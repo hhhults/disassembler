@@ -153,6 +153,7 @@ BUILD_EA_TREE
             MOVE.L  #M_AWA,(A5)+
             MOVE.L  #M_ALA,(A5)+
             MOVE.L  #$00000000,(A5)+
+            MOVE.L  #$00000000,(A5)+
             MOVE.L  #M_IA,(A5)+
             RTS            
 *-----------------------------------------------------------          
@@ -228,6 +229,7 @@ IS_DEST
 IS_SOURCE
             ADDQ    #$4,D5
             MULU.W  #$04,D5
+            ADDQ    #$4,D5
             ADD.L   EA_TREE,D5
             
             MOVEA.L D5,A5
@@ -241,23 +243,42 @@ IS_SOURCE
 *-----------------------------------------------------------            
 LOGIC_PARAMETER_CHK
             CLR.L   D5
+            CLR.L   D1
+
             MOVE.W  D3,D5
-            BTST    #$09,D5
-            BNE     LOGIC_TOEA
+            MOVE.W  D3,D1
+            ANDI.W  #$0E00,D1
+            ROL.W   #$07,D1
             
-LOGIC_TOREG
-            
-            LEA      P_COMMA,A1
-            MOVE     #14,D0
-            TRAP     #15
-            
+            BTST    #$08,D5
+            BEQ     LOGIC_TOEA
+            ;IF THE DESTINATION IS A REGISTER
+            JSR     LOGIC_REGTYPE_CHK
+            CLR.L   D1            
+            LEA     P_COMMA,A1
+            MOVE    #14,D0
+            TRAP    #15            
+            JSR     CHK_EA_SOURCE
+            RTS           
+LOGIC_TOEA  ;IF THE DESTINATION IS AN ADDRESS
+            JSR     CHK_EA_SOURCE            
+            LEA     P_COMMA,A1
+            MOVE    #14,D0
+            TRAP    #15 
+            MOVE.W  D3,D1
+            ANDI.W  #$0E00,D1
+            ROL.W   #$07,D1
+           
+            JSR     LOGIC_REGTYPE_CHK
+            CLR.L   D1            
             RTS
-LOGIC_TOEA
-            
-            LEA      P_COMMA,A1
-            MOVE     #14,D0
-            TRAP     #15
-            
+LOGIC_REGTYPE_CHK
+            CMP     #1,D6
+            BNE     IS_DR
+            JSR     M_AR
+            RTS
+IS_DR        
+            JSR     M_DR    
             RTS
 *-----------------------------------------------------------            
 ;CHECKS AND PRINTS SIZE (.L/.W/.B)FOR ADD/AND/SUB/ADDA/OR/NOT
@@ -291,8 +312,7 @@ LOGIC_WORD  ;IF THE INSTRICTION IS WORD SIZED
             TRAP    #15            
             LEA     P_W,A1
             MOVE.B  #14,D0
-            TRAP    #15
-            MOVE.L  #$03,D6            
+            TRAP    #15            
             BRA     LOGIC_DONE
 LOGIC_LONG    ;IF THE INSTRICTION IS LONG-WORD SIZED
             LEA     P_PERIOD,A1
@@ -300,13 +320,13 @@ LOGIC_LONG    ;IF THE INSTRICTION IS LONG-WORD SIZED
             TRAP    #15            
             LEA     P_L,A1
             MOVE.B  #14,D0
-            TRAP    #15 
-            MOVE.L  #$02,D6 
+            TRAP    #15  
             BRA     LOGIC_DONE
 LOGIC_A     ;IF THE INSTRUCTION IS ADDA, PRINTS THE A
             LEA     P_A,A1
             MOVE.B  #14,D0
-            TRAP    #15                        
+            TRAP    #15
+            MOVE.L  #$01,D6                        
             BTST    #$8,D5
             BNE     LOGIC_WORD
             BRA     LOGIC_LONG                                 
@@ -623,11 +643,10 @@ ADDQ
        MOVE.B   #14,D0
        TRAP     #15
        
-       CLR.L    D5
-       MOVE.W   D3,D5
-       ANDI.W   #$0E00,D5
-       ROL.W    #$07,D5
-       MOVE.W   D5,D1
+       CLR.L    D1
+       MOVE.W   D3,D1
+       ANDI.W   #$0E00,D1
+       ROL.W    #$07,D1
 
        LEA      P_HASH,A1
        MOVE.B   #14,D0    
@@ -639,6 +658,7 @@ ADDQ
        
        MOVE.B   #3,D0
        TRAP     #15
+       CLR.L    D1
        
        LEA      P_COMMA,A1
        MOVE     #14,D0
@@ -653,7 +673,7 @@ AND
        MOVE.B   #14,D0
        TRAP     #15       
        JSR      LOGIC_SIZE_CHK
-       
+       JSR      LOGIC_PARAMETER_CHK
        
        RTS
 *-----------------------------------------------------------       
@@ -662,11 +682,7 @@ ADD
        MOVE.B   #14,D0
        TRAP     #15
        JSR      LOGIC_SIZE_CHK
-       CLR.L    D5
-       MOVE.W   D3,D5
-       BTST     #$09,D5
-       
-       JSR      CHK_EA_SOURCE
+       JSR      LOGIC_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------
 BRA    
@@ -840,6 +856,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~

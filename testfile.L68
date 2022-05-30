@@ -1,6 +1,6 @@
 00005000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 5/29/2022 7:24:08 PM
+Created On: 5/29/2022 9:58:10 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :test file
@@ -11,7 +11,7 @@ Created On: 5/29/2022 7:24:08 PM
 00005000                             7      ORG    $5000
 00005000                             8  START:                  ; first instruction of program
 00005000                             9  
-00005000  283C 00001019             10     MOVE.L   #$00001019,D4
+00005000  283C 00201010             10     MOVE.L   #$00201010,D4
 00005006  DA44                      11     ADD.W    D4,D5
 00005008  DDC5                      12     ADDA.L   D5,A6
 0000500A  DBB9 00009000             13     ADD.L    D5,$9000
