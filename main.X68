@@ -8,7 +8,7 @@
 START:
     *JSR WELCOME
     MOVEA.L #$5000,A2    * for testing
-    MOVEA.L #$501E,A3
+    MOVEA.L #$500F,A3
     MOVEA.L #$00000500,A5
     MOVEA.L  A2,A4      * does this need to be W depending on where in mem start is?
     JSR BUILD_EA_TREE
@@ -250,6 +250,11 @@ LOGIC_DEST_CHK
             CLR.L   D5
             CLR.L   D6
             MOVE.W  D3,D5
+            BTST    #$09,D5
+            
+LOGIC_TOREG
+            
+LOGIC_TOEA
             
             
 *-----------------------------------------------------------            
@@ -291,12 +296,13 @@ LOGIC_LONG    ;IF THE INSTRICTION IS LONG-WORD SIZED
             LEA     P_L,A1
             MOVE.B  #14,D0
             TRAP    #15  
+            BRA     LOGIC_DONE
 LOGIC_A     ;IF THE INSTRUCTION IS ADDA, PRINTS THE A
             LEA     P_A,A1
             MOVE.B  #14,D0
             TRAP    #15                        
             BTST    #$8,D5
-            BEQ     LOGIC_WORD
+            BNE     LOGIC_WORD
             BRA     LOGIC_LONG                                 
 LOGIC_DONE
             LEA     P_SPACE,A1
@@ -467,31 +473,37 @@ MOVEB  LEA MB,A1
        
        RTS 
       
-MOVEQ LEA MQ,A1     ;CHANGE OPCODE SOURCE ANANLYSIS CODE*************************
+MOVEQ LEA MQ,A1     
       MOVE.B #14,D0
       TRAP #15
        
       CLR.L     D5
       MOVE.W    D3,D5
       ADDI.W    #$0F,D5
+      MOVE.W    D5,D1
+      MOVE.B    #3,D0
+      TRAP      #15
       
+      LEA     P_COMMA,A1
+      MOVE    #14,D0
+      TRAP    #15         
       JSR       CHK_EA_DEST
        
       RTS
        
 MOVEL 
-      MOVE.L (A4),D3
-      ROL.L #8,D3
-      ROL.L #2,D3
-      ANDI.B #$07,D3
-      CMP.B #1,D3
+      CLR.L D5
+      MOVE.W D3,D5
+      ANDI.W #$01C0,D5
+      LSR.W #$06,D5
+      CMP.B #1,D5
       BEQ MOVEAL
       
       LEA ML,A1        
 BREAK      
       MOVE.B #14,D0
       TRAP #15
-      CLR   D3
+      CLR.L   D3
       MOVE.W (A4),D3
       JSR   CHK_EA_SOURCE
       JSR   CHK_EA_DEST
@@ -502,11 +514,11 @@ MOVEAL LEA MAL,A1
        BRA BREAK
       
 MOVEW 
-      MOVE.L (A4),D3
-      ROL.L #8,D3
-      ROL.L #2,D3
-      ANDI.B #$07,D3
-      CMP.B #1,D3
+      CLR.L D5
+      MOVE.W D3,D5
+      ANDI.W #$01C0,D5
+      LSR.W #$06,D5
+      CMP.B #1,D5
       BEQ MOVEAW
       
       LEA MW,A1

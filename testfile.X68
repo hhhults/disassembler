@@ -7,18 +7,23 @@
     ORG    $5000
 START:                  ; first instruction of program
 
-    NOT D0
-    NOP
-    LEA DONE,A1
-    JSR DONE
-    SIMHALT             ; halt simulator
+   MOVE.L   #$00001019,D4
+   ADD.W    D4,D5
+   ADDA.L   D5,A6
+   ADD.L    D5,$9000
+;    NOT D0
+;    NOP
+;    LEA DONE,A1
+;    JSR DONE
+;    SIMHALT             ; halt simulator
 
 
-DONE MOVE.B #$F,D0
-     RTS           
+;DONE MOVE.B #$F,D0
+;     RTS           
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 

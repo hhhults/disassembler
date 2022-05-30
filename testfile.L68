@@ -1,6 +1,6 @@
 00005000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 5/29/2022 12:34:10 PM
+Created On: 5/29/2022 7:24:08 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :test file
@@ -11,12 +11,23 @@ Created On: 5/29/2022 12:34:10 PM
 00005000                             7      ORG    $5000
 00005000                             8  START:                  ; first instruction of program
 00005000                             9  
-00005000  327C 8000                 10      MOVEA.W #$8000,A1
-00005004  FFFF FFFF                 11      SIMHALT             ; halt simulator
-00005008                            12             
-00005008                            13  * Put variables and constants here
-00005008                            14  
-00005008                            15      END    START        ; last line of source
+00005000  283C 00001019             10     MOVE.L   #$00001019,D4
+00005006  DA44                      11     ADD.W    D4,D5
+00005008  DDC5                      12     ADDA.L   D5,A6
+0000500A  DBB9 00009000             13     ADD.L    D5,$9000
+00005010  DAB9 00009000             14     ADD.L    $9000,D5
+00005016                            15  ;    NOT D0
+00005016                            16  ;    NOP
+00005016                            17  ;    LEA DONE,A1
+00005016                            18  ;    JSR DONE
+00005016                            19  ;    SIMHALT             ; halt simulator
+00005016                            20  
+00005016                            21  
+00005016                            22  ;DONE MOVE.B #$F,D0
+00005016                            23  ;     RTS           
+00005016                            24  * Put variables and constants here
+00005016                            25  
+00005016                            26      END    START        ; last line of source
 
 No errors detected
 No warnings generated
