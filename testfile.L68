@@ -1,6 +1,6 @@
 00005000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 5/30/2022 7:06:36 PM
+Created On: 5/30/2022 11:07:24 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :test file
@@ -16,19 +16,18 @@ Created On: 5/30/2022 7:06:36 PM
 00005008  DDC5                      12     ADDA.L   D5,A6
 0000500A  DBB9 00009000             13     ADD.L    D5,$9000
 00005010  DAB9 00009000             14     ADD.L    $9000,D5
-00005016  EB5E                      15     ROl.W    #$05,D6
-00005018                            16  ;    NOT D0
-00005018                            17  ;    NOP
-00005018                            18  ;    LEA DONE,A1
-00005018                            19  ;    JSR DONE
-00005018                            20  ;    SIMHALT             ; halt simulator
-00005018                            21  
-00005018                            22  
-00005018                            23  ;DONE MOVE.B #$F,D0
-00005018                            24  ;     RTS           
-00005018                            25  * Put variables and constants here
-00005018                            26  
-00005018                            27      END    START        ; last line of source
+00005016                            15  ;    NOT D0
+00005016                            16  ;    NOP
+00005016                            17  ;    LEA DONE,A1
+00005016                            18  ;    JSR DONE
+00005016                            19  ;    SIMHALT             ; halt simulator
+00005016                            20  
+00005016                            21  
+00005016                            22  ;DONE MOVE.B #$F,D0
+00005016                            23  ;     RTS           
+00005016                            24  * Put variables and constants here
+00005016                            25  
+00005016                            26      END    START        ; last line of source
 
 No errors detected
 No warnings generated

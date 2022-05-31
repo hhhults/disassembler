@@ -227,7 +227,7 @@ IS_SOURCE
             MULU.W  #$04,D5
             ADDQ    #$4,D5
             ADD.L   EA_TREE,D5
-            CLR.L   D6
+            
             MOVEA.L D5,A5
             MOVEA.L (A5),A6
             JSR     (A6)
