@@ -444,12 +444,10 @@ IA_ADDA_SIZE
 IA_LONG
             MOVE.W  (A4)+,D4
             JSR PRINTHEX
-            BRA     IA_END 
             RTS            
 IA_WORD
             MOVE.W  (A4)+,D4
             JSR PRINTHEX
-            BRA     IA_END  
             RTS          
 *-----------------------------------------------------------
 M_ALA   ;IF MODE IS AN ABSOLUTE LONG ADDRESS (xxx).L
