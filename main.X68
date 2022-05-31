@@ -14,7 +14,9 @@ START:
         JSR         BUILD_EA_TREE
         JSR         BUILDTREE    
     
-NEXTLINE 
+NEXTLINE
+        MOVE.W A4,D4
+        JSR PRINTHEX 
         JSR         DECODE_OP
         CMP.L       A4,A3
         BLE         DONE
@@ -91,7 +93,7 @@ BLDLOOP
         MOVE.L #TESTBIT,(A1)   * 44 is decision node, should be B0
         
         ADDA.W #$3C,A1         * should put us at TREE + $EC
-        MOVE.L #TESTBIT,(A1)+  * node 59 is decision
+        MOVE.L #SHIFT_TEST,(A1)+  * node 59 is decision
         MOVE.L #BAD,(A1)       * node 60 is invalid code
         
         ADDA.W #$6C,A1         * should put us at TREE + $15C
@@ -474,11 +476,6 @@ UNDEF
        RTS 
 *-----------------------------------------------------------      
 BAD    
-       LEA      P_HEX,A1
-       MOVE.B   #14,D0    
-       TRAP     #15
-       MOVE.L   A4,D4
-       JSR      PRINTHEX
        LEA      BADDATA,A1
        MOVE.B   #14,D0
        TRAP     #15
@@ -770,6 +767,15 @@ ROL
        JSR      SHIFT_ROTATION_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------
+SHIFT_TEST
+       CLR.L D3
+       MOVE.W (A4),D3
+       ROR.W #6,D3
+       ANDI.B #03,D3
+       CMP.B #3,D3
+       BEQ TESTBIT
+       BRA BAD
+*-----------------------------------------------------------
 TESTBIT
        CLR.L    D3
        MOVE.W   (A4),D3
@@ -898,7 +904,7 @@ NEWLINE     DC.B    '',CR,LF,0
 PROMPT1     DC.B    'Please enter the memory value of the start of the program: ',0
 PROMPT2     DC.B    'Please enter the memory value of the end of the program: ',0
 UNDEFINED   DC.B    'The program should never reach this state.',0
-BADDATA     DC.B    ' Data ',CR,LF,0
+BADDATA     DC.B    ' Data ',0
 MQ          DC.B    'MOVEQ ',0
 MB          DC.B    'MOVE.B ',0
 MAL         DC.B    'MOVEA.L ',0
@@ -947,6 +953,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 
 

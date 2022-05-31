@@ -1,6 +1,6 @@
 00005000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 5/30/2022 11:52:02 PM
+Created On: 5/31/2022 3:54:46 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :test file
@@ -11,23 +11,20 @@ Created On: 5/30/2022 11:52:02 PM
 00005000                             7      ORG    $5000
 00005000                             8  START:                  ; first instruction of program
 00005000                             9  
-00005000  283C 00201010             10     MOVE.L   #$00201010,D4
-00005006  DA44                      11     ADD.W    D4,D5
-00005008  DDC5                      12     ADDA.L   D5,A6
-0000500A  DBB9 00009000             13     ADD.L    D5,$9000
-00005010  DAB9 00009000             14     ADD.L    $9000,D5
-00005016                            15  ;    NOT D0
-00005016                            16  ;    NOP
-00005016                            17  ;    LEA DONE,A1
-00005016                            18  ;    JSR DONE
-00005016                            19  ;    SIMHALT             ; halt simulator
-00005016                            20  
-00005016                            21  
-00005016                            22  ;DONE MOVE.B #$F,D0
-00005016                            23  ;     RTS           
-00005016                            24  * Put variables and constants here
-00005016                            25  
-00005016                            26      END    START        ; last line of source
+00005000  E6F9 00009000             10       ROR.W $00009000
+00005006  E658                      11       ROR.W #3,D0
+00005008                            12  ;    NOT D0
+00005008                            13  ;    NOP
+00005008                            14  ;    LEA DONE,A1
+00005008                            15  ;    JSR DONE
+00005008                            16  ;    SIMHALT             ; halt simulator
+00005008                            17  
+00005008                            18  
+00005008                            19  ;DONE MOVE.B #$F,D0
+00005008                            20  ;     RTS           
+00005008                            21  * Put variables and constants here
+00005008                            22  
+00005008                            23      END    START        ; last line of source
 
 No errors detected
 No warnings generated
