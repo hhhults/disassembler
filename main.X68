@@ -761,7 +761,7 @@ ROL
        RTS
 *-----------------------------------------------------------
 TESTBIT
-       CLR.L D3
+       CLR.L    D3
        MOVE.W   (A4),D3
        MOVE.L   A5,D1
        SUB.L    TREE,D1
@@ -818,59 +818,62 @@ PRINTHEX
          MOVE.B #1,D5
 NEXTDIG  
          MOVE.L D4,D1
-         ASL.B #2,D5
-         ROL.L D5,D1
-         ASR.B #2,D5
+         ASL.B  #2,D5
+         ROL.L  D5,D1
+         ASR.B  #2,D5
          
-         AND.L #$0000000F,D1
-         CMP.B #$F,D1
-         BEQ IF_F
-         CMP.B #$E,D1
-         BEQ IF_E
-         CMP.B #$D,D1
-         BEQ IF_D
-         CMP.B #$C,D1
-         BEQ IF_C
-         CMP.B #$B,D1
-         BEQ IF_B
-         CMP.B #$A,D1
-         BEQ IF_A
+         AND.L  #$0000000F,D1
+         CMP.B  #$F,D1
+         BEQ    IF_F
+         CMP.B  #$E,D1
+         BEQ    IF_E
+         CMP.B  #$D,D1
+         BEQ    IF_D
+         CMP.B  #$C,D1
+         BEQ    IF_C
+         CMP.B  #$B,D1
+         BEQ    IF_B
+         CMP.B  #$A,D1
+         BEQ    IF_A
          
          MOVE.B #3,D0
-         TRAP #15
+         TRAP   #15
 LP_INC         
-         ADDQ #1,D5
-         CMP.B #8,D5
-         BLE NEXTDIG
+         ADDQ   #1,D5
+         CMP.B  #8,D5
+         BLE    NEXTDIG
          RTS
          
-
-IF_A LEA P_A,A1
-     MOVE.B #14,D0
-     TRAP #15
-     BRA LP_INC
-     
-IF_B LEA P_B,A1
-     MOVE.B #14,D0
-     TRAP #15
-     BRA LP_INC
-IF_C LEA P_C,A1
-     MOVE.B #14,D0
-     TRAP #15
-     BRA LP_INC
-IF_D LEA P_D,A1
-     MOVE.B #14,D0
-     TRAP #15
-     BRA LP_INC
-IF_E LEA P_E,A1
-     MOVE.B #14,D0
-     TRAP #15
-     BRA LP_INC
-IF_F LEA P_F,A1
-     MOVE.B #14,D0
-     TRAP #15
-     BRA LP_INC
-
+IF_A     LEA    P_A,A1
+         MOVE.B #14,D0
+         TRAP   #15
+         BRA    LP_INC     
+IF_B     
+         LEA    P_B,A1
+         MOVE.B #14,D0
+         TRAP   #15
+         BRA    LP_INC
+IF_C     
+         LEA    P_C,A1
+         MOVE.B #14,D0
+         TRAP   #15
+         BRA    LP_INC
+IF_D     
+         LEA    P_D,A1
+         MOVE.B #14,D0
+         TRAP   #15
+         BRA    LP_INC
+IF_E     
+         LEA    P_E,A1
+         MOVE.B #14,D0
+         TRAP   #15
+         BRA    LP_INC
+IF_F 
+         LEA    P_F,A1
+         MOVE.B #14,D0
+         TRAP   #15
+         BRA    LP_INC
+*-----------------------------------------------------------
 
     
 * var storage
