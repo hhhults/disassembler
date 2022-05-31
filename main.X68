@@ -7,6 +7,7 @@
     ORG    $1000
 START:
         *JSR        WELCOME
+
         MOVEA.L     #$5000,A2    * for testing
         MOVEA.L     #$5015,A3
         MOVEA.L     #$00000500,A5
@@ -435,24 +436,26 @@ M_IA    ;IF MODE IS IMMIDIATE ADDRESSING #IMM
             ANDI.W  #$3000,D4
             ROL.W   #$04,D4            
             
+            
             CMP     #$3,D4
             BEQ     IA_WORD
             
             CMP     #2,D4
             BEQ     IA_LONG
             
+            CMP     #1,D4        * idk
+            BEQ     IA_WORD
+            
 IA_END      RTS
             
 IA_LONG
-            MOVE.L  (A4)+,D1
-            MOVE.B  #3,D0
-            TRAP    #15
+            MOVE.L  (A4)+,D4
+            JSR PRINTHEX
             BRA     IA_END
             
 IA_WORD
-            MOVE.W  (A4)+,D1
-            MOVE.B  #3,D0
-            TRAP    #15  
+            MOVE.W  (A4)+,D4
+            JSR PRINTHEX
             BRA     IA_END          
 *-----------------------------------------------------------
 M_ALA   ;IF MODE IS AN ABSOLUTE LONG ADDRESS (xxx).L
@@ -461,9 +464,8 @@ M_ALA   ;IF MODE IS AN ABSOLUTE LONG ADDRESS (xxx).L
             MOVE.B  #14,D0    
             TRAP    #15 
             
-            MOVE.L  (A4)+,D1
-            MOVE.B  #3,D0
-            TRAP    #15
+            MOVE.L  (A4)+,D4
+            JSR PRINTHEX
 
             RTS  
 *-----------------------------------------------------------
@@ -473,9 +475,8 @@ M_AWA   ;IF MODE IS AN ABSOLUTE WORD ADDRESS (xxx).W
             MOVE.B  #14,D0    
             TRAP    #15 
             
-            MOVE.W  (A4)+,D1
-            MOVE.B  #3,D0
-            TRAP    #15
+            MOVE.W  (A4)+,D4
+            JSR PRINTHEX
 
             RTS    
 *-----------------------------------------------------------
@@ -498,7 +499,7 @@ MOVEB
        LEA      MB,A1
        MOVE.B   #14,D0
        TRAP     #15
-       
+       MOVE.W   (A4),D3
        JSR      CHK_EA_SOURCE
        LEA      P_COMMA,A1
        MOVE     #14,D0
@@ -584,20 +585,18 @@ NOPETC
        CMP.B    #$46,D3
        BEQ      NOT
        
-       MOVE.L   (A4),D3
-       BTST.L   #$18,D3
+       MOVE.W   (A4),D3
+       BTST.L   #$8,D3
        BNE      LEA 
        BTST.L   D2,D3 
        BEQ      BAD
-       ROL.L    #8,D3
-       ROL.L    #2,D3
+       ROR.W    #6,D3
        ANDI.W   #$03FF,D3
        CMP.W    #$013A,D3
        BEQ      JSR
        
        MOVE.L   (A4),D3
-       ROL.L    #8,D3
-       ROL.L    #6,D3
+       ROR.W    #2,D3
        ANDI     #$3FFF,D3
        CMP.W    #$139D,D3
        BEQ      RTS
@@ -618,12 +617,25 @@ LEA
        LEA      LA,A1        ;NOT WORKING RN*******************************************
        MOVE.B   #14,D0
        TRAP     #15
+       MOVE.W   (A4),D3
+       JSR      CHK_EA_SOURCE
+       LEA      P_COMMA,A1
+       MOVE     #14,D0
+       TRAP     #15
+       CLR.L   D1
+       MOVE.W  D3,D1 
+       ANDI.W  #$0E00,D1
+       ROL.W   #$7,D1
+       JSR M_AR
+
        RTS
 *-----------------------------------------------------------
 JSR    
        LEA      JS,A1        ;NOT WORKING RN************************************
        MOVE.B   #14,D0
        TRAP     #15
+       MOVE.W   (A4),D3
+       JSR      CHK_EA_SOURCE
        RTS
 *-----------------------------------------------------------       
 RTS    
@@ -744,6 +756,7 @@ ROL
        RTS
 *-----------------------------------------------------------
 TESTBIT
+       CLR.L D3
        MOVE.W   (A4),D3
        MOVE.L   A5,D1
        SUB.L    TREE,D1
@@ -796,6 +809,65 @@ WRITE                     * write hex val to D3
        BNE      LOOP1
        RTS
 *-----------------------------------------------------------
+PRINTHEX 
+         MOVE.B #1,D5
+NEXTDIG  
+         MOVE.L D4,D1
+         ASL.B #2,D5
+         ROL.L D5,D1
+         ASR.B #2,D5
+         
+         AND.L #$0000000F,D1
+         CMP.B #$F,D1
+         BEQ IF_F
+         CMP.B #$E,D1
+         BEQ IF_E
+         CMP.B #$D,D1
+         BEQ IF_D
+         CMP.B #$C,D1
+         BEQ IF_C
+         CMP.B #$B,D1
+         BEQ IF_B
+         CMP.B #$A,D1
+         BEQ IF_A
+         
+         MOVE.B #3,D0
+         TRAP #15
+LP_INC         
+         ADDQ #1,D5
+         CMP.B #8,D5
+         BLE NEXTDIG
+         RTS
+         
+
+IF_A LEA P_A,A1
+     MOVE.B #14,D0
+     TRAP #15
+     BRA LP_INC
+     
+IF_B LEA P_B,A1
+     MOVE.B #14,D0
+     TRAP #15
+     BRA LP_INC
+IF_C LEA P_C,A1
+     MOVE.B #14,D0
+     TRAP #15
+     BRA LP_INC
+IF_D LEA P_D,A1
+     MOVE.B #14,D0
+     TRAP #15
+     BRA LP_INC
+IF_E LEA P_E,A1
+     MOVE.B #14,D0
+     TRAP #15
+     BRA LP_INC
+IF_F LEA P_F,A1
+     MOVE.B #14,D0
+     TRAP #15
+     BRA LP_INC
+
+
+
     
 * var storage
 TREE        DC.L    $7000  
@@ -827,7 +899,7 @@ BG          DC.B    'BGT ',0
 BL          DC.B    'BLE ',0
 AR          DC.B    'ASR',0
 AL          DC.B    'ASL',0
-LA          DC.B    'LEA',0
+LA          DC.B    'LEA ',0
 LR          DC.B    'LSR',0
 LL          DC.B    'LSL',0
 RR          DC.B    'ROR',0
@@ -837,9 +909,12 @@ JS          DC.B    'JSR ',0
 RT          DC.B    'RTS',0
 
 ;necessary symbols for displaying EA's
-P_D         DC.B    'D',0
 P_A         DC.B    'A',0
 P_B         DC.B    'B',0
+P_C         DC.B    'C',0
+P_D         DC.B    'D',0
+P_E         DC.B    'E',0
+P_F         DC.B    'F',0
 P_W         DC.B    'W',0
 P_L         DC.B    'L',0
 P_PERIOD    DC.B    '.',0
@@ -855,6 +930,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 *~Font name~Courier New~
 *~Font size~10~
