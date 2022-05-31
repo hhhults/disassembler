@@ -417,7 +417,7 @@ M_IA    ;IF MODE IS IMMIDIATE ADDRESSING #IMM
             CMP     #6,D6
             BEQ     IA_LOGIC_SIZE
             CMP     #8,D6
-            BRA     IA_ADDA_SIZE
+            BEQ     IA_ADDA_SIZE
             
             ANDI.W  #$3000,D4
             ROL.W   #4,D4
