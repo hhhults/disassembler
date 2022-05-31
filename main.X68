@@ -319,10 +319,11 @@ LOGIC_DONE
              
             RTS   
 *-----------------------------------------------------------  
-SHIFT_ROTATION_PARAMETER_CHK   
-*-----------------------------------------------------------    
-M_DR    ;IF MODE IS A DATA REGISTER Dn
+SHIFT_ROTATION_PARAMETER_CHK  
             
+            RTS 
+*-----------------------------------------------------------    
+M_DR    ;IF MODE IS A DATA REGISTER Dn           
             LEA     P_D,A1
             MOVE.B  #14,D0    
             TRAP    #15
@@ -333,7 +334,6 @@ M_DR    ;IF MODE IS A DATA REGISTER Dn
             RTS
 *-----------------------------------------------------------            
 M_AR    ;IF MODE IS AN ADDRESS REGISTER An
-
             LEA     P_A,A1
             MOVE.B  #14,D0    
             TRAP    #15  
@@ -344,7 +344,6 @@ M_AR    ;IF MODE IS AN ADDRESS REGISTER An
             RTS
 *-----------------------------------------------------------
 M_DIR_A ;IF MODE IS A DIRECT ADDRESS (An)
-
             LEA     P_OPEN_PAR,A1
             MOVE.B  #14,D0    
             TRAP    #15 
@@ -360,7 +359,6 @@ M_DIR_A ;IF MODE IS A DIRECT ADDRESS (An)
             RTS  
 *-----------------------------------------------------------
 M_API   ;IF MODE IS AN ADDRESS WITH POSTINCREMENT (An)+
-
             LEA     P_OPEN_PAR,A1
             MOVE.B  #14,D0    
             TRAP    #15 
@@ -383,7 +381,6 @@ M_API   ;IF MODE IS AN ADDRESS WITH POSTINCREMENT (An)+
             RTS  
 *-----------------------------------------------------------
 M_APD   ;IF MODE IS AN ADDRESS WITH PREDECREMENT -(An)
-
             LEA     P_MINUS,A1
             MOVE.B  #14,D0    
             TRAP    #15
@@ -406,7 +403,6 @@ M_APD   ;IF MODE IS AN ADDRESS WITH PREDECREMENT -(An)
             RTS  
 *-----------------------------------------------------------
 M_IA    ;IF MODE IS IMMIDIATE ADDRESSING #IMM
-
             LEA     P_HASH,A1
             MOVE.B  #14,D0    
             TRAP    #15             
@@ -450,7 +446,6 @@ IA_WORD
             RTS          
 *-----------------------------------------------------------
 M_ALA   ;IF MODE IS AN ABSOLUTE LONG ADDRESS (xxx).L
-
             LEA     P_HEX,A1
             MOVE.B  #14,D0    
             TRAP    #15 
@@ -461,7 +456,6 @@ M_ALA   ;IF MODE IS AN ABSOLUTE LONG ADDRESS (xxx).L
             RTS  
 *-----------------------------------------------------------
 M_AWA   ;IF MODE IS AN ABSOLUTE WORD ADDRESS (xxx).W
-
             LEA     P_HEX,A1
             MOVE.B  #14,D0    
             TRAP    #15 
@@ -728,36 +722,42 @@ ASR
        LEA      AR,A1
        MOVE.B   #14,D0
        TRAP     #15
+       JSR      SHIFT_ROTATION_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------       
 ASL    
        LEA      AL,A1
        MOVE.B   #14,D0
        TRAP     #15
+       JSR      SHIFT_ROTATION_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------       
 LSR    
        LEA      LR,A1
        MOVE.B   #14,D0
        TRAP     #15
+       JSR      SHIFT_ROTATION_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------       
 LSL    
        LEA      LL,A1
        MOVE.B   #14,D0
        TRAP     #15
+       JSR      SHIFT_ROTATION_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------       
 ROR    
        LEA      RR,A1
        MOVE.B   #14,D0
        TRAP     #15
+       JSR      SHIFT_ROTATION_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------       
 ROL    
        LEA      RL,A1
        MOVE.B   #14,D0
        TRAP     #15
+       JSR      SHIFT_ROTATION_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------
 TESTBIT
