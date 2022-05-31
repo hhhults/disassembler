@@ -474,9 +474,19 @@ UNDEF
        RTS 
 *-----------------------------------------------------------      
 BAD    
+       LEA      P_HEX,A1
+       MOVE.B   #14,D0    
+       TRAP     #15
+       MOVE.L   A4,D4
+       JSR      PRINTHEX
        LEA      BADDATA,A1
        MOVE.B   #14,D0
        TRAP     #15
+       LEA      P_HEX,A1
+       MOVE.B   #14,D0    
+       TRAP     #15
+       MOVE.L   D3,D4
+       JSR      PRINTHEX
        ADD.L    #$2,A4
        RTS
 *-----------------------------------------------------------      
@@ -888,7 +898,7 @@ NEWLINE     DC.B    '',CR,LF,0
 PROMPT1     DC.B    'Please enter the memory value of the start of the program: ',0
 PROMPT2     DC.B    'Please enter the memory value of the end of the program: ',0
 UNDEFINED   DC.B    'The program should never reach this state.',0
-BADDATA     DC.B    'The data on line ____ is not a valid opcode.',CR,LF,0
+BADDATA     DC.B    ' Data ',CR,LF,0
 MQ          DC.B    'MOVEQ ',0
 MB          DC.B    'MOVE.B ',0
 MAL         DC.B    'MOVEA.L ',0
@@ -937,6 +947,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 
 
