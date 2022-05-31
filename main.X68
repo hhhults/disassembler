@@ -456,7 +456,7 @@ M_ALA   ;IF MODE IS AN ABSOLUTE LONG ADDRESS (xxx).L
             MOVE.B  #14,D0    
             TRAP    #15 
             
-            MOVE.W  (A4)+,D4
+            MOVE.L  (A4)+,D4
             JSR PRINTHEX
 
             RTS  
@@ -467,7 +467,7 @@ M_AWA   ;IF MODE IS AN ABSOLUTE WORD ADDRESS (xxx).W
             MOVE.B  #14,D0    
             TRAP    #15 
             
-            MOVE.W  (A4)+,D4
+            MOVE.L  (A4)+,D4
             JSR PRINTHEX
 
             RTS    
