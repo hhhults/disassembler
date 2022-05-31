@@ -425,8 +425,7 @@ M_IA    ;IF MODE IS IMMIDIATE ADDRESSING #IMM
             BEQ     IA_WORD            
             CMP     #2,D4
             BEQ     IA_LONG    
-            CMP     #1,D4
-            BEQ     IA_LONG  
+            
 IA_LOGIC_SIZE
             ANDI.W  #$00C0,D4
             LSR.W   #6,D4
@@ -442,7 +441,7 @@ IA_ADDA_SIZE
             CMP     #1,D4
             BEQ     IA_LONG                             
 IA_LONG
-            MOVE.W  (A4)+,D4
+            MOVE.L  (A4)+,D4
             JSR PRINTHEX
             RTS            
 IA_WORD
@@ -935,6 +934,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 
 
