@@ -1,8 +1,8 @@
 *-----------------------------------------------------------
 * Title      : motorola 68k disassembler prototype
-* Written by : Harper Hults
-* Date       : 5/25/22
-* Description: allows for decoding of MOVEB and MOVEQ opcodes.
+* Written by : Harper Hults, Camas Collins also helped a little
+* Date       : 5/29/22
+* Description: allows for decoding of opcodes.
 *-----------------------------------------------------------
     ORG    $1000
 START:
@@ -12,8 +12,7 @@ START:
         MOVEA.L     #$00000500,A5
         MOVEA.L     A2,A4      * does this need to be W depending on where in mem start is?
         JSR         BUILD_EA_TREE
-        JSR         BUILDTREE
-    
+        JSR         BUILDTREE    
     
 NEXTLINE 
         JSR         DECODE_OP
@@ -23,7 +22,6 @@ NEXTLINE
         MOVE        #13,D0
         TRAP        #15
         BRA         NEXTLINE
-
 
 DONE                * end program
         MOVE.B      #9,D0
@@ -152,24 +150,23 @@ BUILD_EA_TREE
             ;ABSOLUTE AND IMMEDIATE ADDED TO ARRAY           
             MOVE.L  #M_AWA,(A5)+
             MOVE.L  #M_ALA,(A5)+
-            MOVE.L  #$00000000,(A5)+
-            MOVE.L  #$00000000,(A5)+
+            MOVE.L  #$00000000,(A5)+ ;added to simplify algorithm
+            MOVE.L  #$00000000,(A5)+ ;added to simplify algorithm
             MOVE.L  #M_IA,(A5)+
             RTS            
 *-----------------------------------------------------------          
 ;COMPARES A SOURCE MODE FROM THE OPCODE TO THE EA TREE
 CHK_EA_SOURCE         
-            CLR.L   D6
-            MOVE.L  A4,D6
-            ADDQ    #$2,D6
-            MOVEA.L D6,A4  
+            CLR.L   D5
+            MOVE.L  A4,D5
+            ADDQ    #$2,D5
+            MOVEA.L D5,A4  
                
             CLR.L   D5
             MOVE.W  D3,D5 
             ANDI.W  #$0038,D5
             LSR.W   #$3,D5
             
-            CLR.L   D6
             CMP.B   #$7,D5
             BEQ     IS_ABS_IMM            
             
@@ -191,12 +188,12 @@ CHK_EA_SOURCE
 ;COMPARES A DESTINATION MODE FROM THE OPCODE TO THE EA TREE FOR MOVE INSTRUCTIONS
 CHK_EA_DEST       
             CLR.L   D5
-            CLR.L   D6
             MOVE.W  D3,D5 
             ANDI.W  #$01C0,D5
             LSR.W   #$6,D5
             
-            MOVE.B  #9,D6
+            MOVE.L  #9,D6
+            
             CMP.B   #$7,D5
             BEQ     IS_ABS_IMM            
             
@@ -216,28 +213,24 @@ CHK_EA_DEST
 *-----------------------------------------------------------
 ;COMPARES REGISTER NUMBER FOR ABSOLUTES AND IMMEDIATES FOR PRINTING
 IS_ABS_IMM      
-            CMP     #9,D6
-            BEQ     IS_DEST
-            
             MOVE.W  D3,D5
+            CMP     #9,D6
+            BEQ     IS_DEST                   
             ANDI.W  #$0007,D5
             BRA     IS_SOURCE                        
-IS_DEST                        
-            MOVE.W  D3,D5
+IS_DEST    
             ANDI.W  #$0E00,D5
             ROL.W   #$07,D5
+            BRA     IS_SOURCE             
 IS_SOURCE
             ADDQ    #$4,D5
             MULU.W  #$04,D5
             ADDQ    #$4,D5
             ADD.L   EA_TREE,D5
-            
+            CLR.L   D6
             MOVEA.L D5,A5
             MOVEA.L (A5),A6
             JSR     (A6)
-            
-            CMP     #9,D6
-            BEQ     RTS
             
             RTS
 *-----------------------------------------------------------            
@@ -246,39 +239,29 @@ LOGIC_PARAMETER_CHK
             CLR.L   D1
 
             MOVE.W  D3,D5
-            MOVE.W  D3,D1
-            ANDI.W  #$0E00,D1
-            ROL.W   #$07,D1
-            
             BTST    #$08,D5
             BEQ     LOGIC_TOEA
             ;IF THE DESTINATION IS A REGISTER
-            JSR     LOGIC_REGTYPE_CHK
+            MOVE.W  D3,D1
+            ANDI.W  #$0E00,D1
+            ROL.W   #$07,D1
+            JSR     M_DR 
             CLR.L   D1            
             LEA     P_COMMA,A1
             MOVE    #14,D0
-            TRAP    #15            
+            TRAP    #15           
             JSR     CHK_EA_SOURCE
             RTS           
-LOGIC_TOEA  ;IF THE DESTINATION IS AN ADDRESS
+LOGIC_TOEA  ;IF THE DESTINATION IS AN ADDRESS            
             JSR     CHK_EA_SOURCE            
             LEA     P_COMMA,A1
             MOVE    #14,D0
             TRAP    #15 
             MOVE.W  D3,D1
             ANDI.W  #$0E00,D1
-            ROL.W   #$07,D1
-           
-            JSR     LOGIC_REGTYPE_CHK
+            ROL.W   #$07,D1          
+            JSR     M_DR 
             CLR.L   D1            
-            RTS
-LOGIC_REGTYPE_CHK
-            CMP     #1,D6
-            BNE     IS_DR
-            JSR     M_AR
-            RTS
-IS_DR        
-            JSR     M_DR    
             RTS
 *-----------------------------------------------------------            
 ;CHECKS AND PRINTS SIZE (.L/.W/.B)FOR ADD/AND/SUB/ADDA/OR/NOT
@@ -303,8 +286,7 @@ LOGIC_BYTE  ;IF THE INSTRICTION IS BYTE SIZED
             TRAP    #15            
             LEA     P_B,A1
             MOVE.B  #14,D0
-            TRAP    #15
-            MOVE.L  #$01,D6            
+            TRAP    #15            
             BRA     LOGIC_DONE
 LOGIC_WORD  ;IF THE INSTRICTION IS WORD SIZED
             LEA     P_PERIOD,A1
@@ -326,15 +308,18 @@ LOGIC_A     ;IF THE INSTRUCTION IS ADDA, PRINTS THE A
             LEA     P_A,A1
             MOVE.B  #14,D0
             TRAP    #15
-            MOVE.L  #$01,D6                        
+            MOVE.L  #$08,D6                        
             BTST    #$8,D5
             BNE     LOGIC_WORD
             BRA     LOGIC_LONG                                 
 LOGIC_DONE
             LEA     P_SPACE,A1
             MOVE    #14,D0
-            TRAP    #15 
-            RTS      
+            TRAP    #15
+             
+            RTS   
+*-----------------------------------------------------------  
+SHIFT_ROTATION_PARAMETER_CHK   
 *-----------------------------------------------------------    
 M_DR    ;IF MODE IS A DATA REGISTER Dn
             
@@ -424,36 +409,46 @@ M_IA    ;IF MODE IS IMMIDIATE ADDRESSING #IMM
 
             LEA     P_HASH,A1
             MOVE.B  #14,D0    
-            TRAP    #15 
-            
+            TRAP    #15             
             LEA     P_HEX,A1
             MOVE.B  #14,D0    
             TRAP    #15
+            MOVE.W  D3,D4   
+            CMP     #6,D6
+            BEQ     IS_LOGIC_SIZE
+            CMP     #8,D6
+            BRA     IS_ADDA_SIZE
             
-            CLR.L   D4
-            MOVE.W  D3,D4
             ANDI.W  #$3000,D4
-            ROL.W   #$04,D4            
-            
+            ROL.W   #4,D4
             CMP     #$3,D4
-            BEQ     IA_WORD
-            
+            BEQ     IA_WORD            
             CMP     #2,D4
-            BEQ     IA_LONG
-            
-IA_END      RTS
-            
+            BEQ     IA_LONG            
+IA_LOGIC_SIZE
+            ANDI.W  #$00C0,D4
+            LSR.W   #6,D4
+            CMP     #$1,D4
+            BEQ     IA_WORD            
+            CMP     #2,D4
+            BEQ     IA_LONG   
+IA_ADDA_SIZE 
+            ANDI.W  #$0100
+            LSR.W   #8,D4
+            CMP     #$0,D4
+            BEQ     IA_WORD            
+            CMP     #1,D4
+            BEQ     IA_LONG                             
 IA_LONG
             MOVE.L  (A4)+,D1
             MOVE.B  #3,D0
             TRAP    #15
-            BRA     IA_END
-            
+            RTS            
 IA_WORD
             MOVE.W  (A4)+,D1
             MOVE.B  #3,D0
             TRAP    #15  
-            BRA     IA_END          
+            RTS          
 *-----------------------------------------------------------
 M_ALA   ;IF MODE IS AN ABSOLUTE LONG ADDRESS (xxx).L
 
@@ -512,10 +507,9 @@ MOVEQ
        MOVE.B   #14,D0
        TRAP     #15
        
-       CLR.L    D5
-       MOVE.W   D3,D5
-       ADDI.W   #$0F,D5
-       MOVE.W   D5,D1
+       CLR.L    D1
+       MOVE.W   D3,D1
+       ADDI.W   #$00FF,D1
        MOVE.B   #3,D0
        TRAP     #15
       
@@ -537,8 +531,6 @@ MOVEL
 BREAKL      
        MOVE.B   #14,D0
        TRAP     #15
-       CLR.L    D3
-       MOVE.W   (A4),D3
        JSR      CHK_EA_SOURCE
        LEA      P_COMMA,A1
        MOVE     #14,D0
@@ -574,7 +566,8 @@ SUB
        LEA      SB,A1
        MOVE.B   #14,D0
        TRAP     #15       
-       JSR      LOGIC_SIZE_CHK   
+       JSR      LOGIC_SIZE_CHK 
+       MOVE.L   #6,D6  
        JSR      LOGIC_PARAMETER_CHK    
        RTS      
 *-----------------------------------------------------------      
@@ -607,10 +600,11 @@ NOPETC
        RTS
 *-----------------------------------------------------------       
 NOT    
-       LEA      NT,A1        ;DONE, NEEDS TESTING *********************************
+       LEA      NT,A1        
        MOVE.B   #14,D0
        TRAP     #15
        JSR      LOGIC_SIZE_CHK
+       MOVE.L   #6,D6
        JSR      CHK_EA_SOURCE
        RTS     
 *-----------------------------------------------------------
@@ -663,7 +657,7 @@ ADDQ
        LEA      P_COMMA,A1
        MOVE     #14,D0
        TRAP     #15
-
+       MOVE.L   #6,D6
        JSR      CHK_EA_SOURCE
        
        RTS
@@ -673,6 +667,7 @@ AND
        MOVE.B   #14,D0
        TRAP     #15       
        JSR      LOGIC_SIZE_CHK
+       MOVE.L   #6,D6
        JSR      LOGIC_PARAMETER_CHK  
        RTS
 *-----------------------------------------------------------       
@@ -681,7 +676,21 @@ ADD
        MOVE.B   #14,D0
        TRAP     #15
        JSR      LOGIC_SIZE_CHK
+       CMP      #8,D6
+       BEQ      IS_ADDA
+       MOVE.L   #6,D6
        JSR      LOGIC_PARAMETER_CHK
+       RTS
+IS_ADDA
+       JSR      CHK_EA_SOURCE
+       LEA      P_COMMA,A1
+       MOVE     #14,D0
+       TRAP     #15
+       CLR.L    D1
+       MOVE.W   D3,D1
+       ANDI.W   #$0E00,D1
+       ROL.W    #$07,D1
+       JSR      M_AR
        RTS
 *-----------------------------------------------------------
 BRA    
@@ -855,6 +864,9 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
+
+
 
 *~Font name~Courier New~
 *~Font size~10~
