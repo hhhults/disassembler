@@ -415,9 +415,9 @@ M_IA    ;IF MODE IS IMMIDIATE ADDRESSING #IMM
             TRAP    #15
             MOVE.W  D3,D4   
             CMP     #6,D6
-            BEQ     IS_LOGIC_SIZE
+            BEQ     IA_LOGIC_SIZE
             CMP     #8,D6
-            BRA     IS_ADDA_SIZE
+            BRA     IA_ADDA_SIZE
             
             ANDI.W  #$3000,D4
             ROL.W   #4,D4
@@ -433,7 +433,7 @@ IA_LOGIC_SIZE
             CMP     #2,D4
             BEQ     IA_LONG   
 IA_ADDA_SIZE 
-            ANDI.W  #$0100
+            ANDI.W  #$0100,D4
             LSR.W   #8,D4
             CMP     #$0,D4
             BEQ     IA_WORD            
