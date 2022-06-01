@@ -1,6 +1,6 @@
 00005000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 5/31/2022 3:54:46 PM
+Created On: 5/31/2022 5:08:53 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :test file
@@ -11,20 +11,24 @@ Created On: 5/31/2022 3:54:46 PM
 00005000                             7      ORG    $5000
 00005000                             8  START:                  ; first instruction of program
 00005000                             9  
-00005000  E6F9 00009000             10       ROR.W $00009000
-00005006  E658                      11       ROR.W #3,D0
-00005008                            12  ;    NOT D0
-00005008                            13  ;    NOP
-00005008                            14  ;    LEA DONE,A1
-00005008                            15  ;    JSR DONE
-00005008                            16  ;    SIMHALT             ; halt simulator
-00005008                            17  
-00005008                            18  
-00005008                            19  ;DONE MOVE.B #$F,D0
-00005008                            20  ;     RTS           
-00005008                            21  * Put variables and constants here
-00005008                            22  
-00005008                            23      END    START        ; last line of source
+00005000  283C 00201010             10     MOVE.L   #$00201010,D4
+00005006  DA44                      11     ADD.W    D4,D5
+00005008  DDC5                      12     ADDA.L   D5,A6
+0000500A  DBB9 00009000             13     ADD.L    D5,$9000
+00005010  DAB9 00009000             14     ADD.L    $9000,D5
+00005016  C23C 0012                 15     AND.B    #$12,D1
+0000501A                            16  ;    NOT D0
+0000501A                            17  ;    NOP
+0000501A                            18  ;    LEA DONE,A1
+0000501A                            19  ;    JSR DONE
+0000501A                            20  ;    SIMHALT             ; halt simulator
+0000501A                            21  
+0000501A                            22  
+0000501A                            23  ;DONE MOVE.B #$F,D0
+0000501A                            24  ;     RTS           
+0000501A                            25  * Put variables and constants here
+0000501A                            26  
+0000501A                            27      END    START        ; last line of source
 
 No errors detected
 No warnings generated

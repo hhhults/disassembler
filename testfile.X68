@@ -12,6 +12,7 @@ START:                  ; first instruction of program
    ADDA.L   D5,A6
    ADD.L    D5,$9000
    ADD.L    $9000,D5
+   AND.B    #$12,D1
 ;    NOT D0
 ;    NOP
 ;    LEA DONE,A1
@@ -24,6 +25,7 @@ START:                  ; first instruction of program
 * Put variables and constants here
 
     END    START        ; last line of source
+
 
 
 
