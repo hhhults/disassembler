@@ -344,12 +344,136 @@ LOGIC_DONE
              
             RTS   
 *-----------------------------------------------------------  
-SHIFT_ROTATION_PARAMETER_CHK  
+SHIFT_REG_PARAMETER_CHK  
+            ;ROTATION VALUE CHECK
             CLR.L   D5
             MOVE.L  A4,D5
             ADDQ    #$2,D5
             MOVEA.L D5,A4
+            CLR.L   D5
+            MOVE.W  D3,D5
+            ADDI.W  #$0018,D5
+            LSR.W   #2,D5
+            CMP     #0,D5
+            BEQ     SHIFT_ASD
+            CMP     #1,D5
+            BEQ     SHIFT_LSD
+            CMP     #2,D5
+            BEQ     NOT_MY_PROBLEM
+            CMP     #3,D5
+            BEQ     SHIFT_ROD
+SHIFT_ASD
+            BTST    #$8,D3
+            BEQ     ASD_LEFT
+            LEA     AR,A1
+            MOVE    #14,D0
+            TRAP    #15
+            BRA     SHIFT_SIZE
+ASD_LEFT
+            LEA     AL,A1
+            MOVE    #14,D0
+            TRAP    #15
+            BRA     SHIFT_SIZE            
+SHIFT_LSD
+            BTST    #$8,D3
+            BEQ     LSD_LEFT
+            LEA     LR,A1
+            MOVE    #14,D0
+            TRAP    #15
+            BRA     SHIFT_SIZE
+LSD_LEFT
+            LEA     LL,A1
+            MOVE    #14,D0
+            TRAP    #15
+            BRA     SHIFT_SIZE
+SHIFT_ROD
+            BTST    #$8,D3
+            BEQ     ROD_LEFT
+            LEA     RR,A1
+            MOVE    #14,D0
+            TRAP    #15
+            BRA     SHIFT_SIZE
+ROD_LEFT
+            LEA     RL,A1
+            MOVE    #14,D0
+            TRAP    #15
+SHIFT_SIZE
+            LEA     P_PERIOD,A1
+            MOVE.B  #14,D0
+            TRAP    #15
+            CLR.L   D5
+            MOVE.W  D3,D5
+            ANDI.W  #$00C0,D5
+            LSR.W   #6,D5
+            CMP     #0,D5
+            BEQ     SHIFT_ISBYTE
+            CMP     #1,D5
+            BEQ     SHIFT_ISWORD
+            LEA     P_L,A1
+            MOVE.B  #14,D0
+            TRAP    #15
+            BRA     SHIFT_POSTSIZE
+SHIFT_ISBYTE
+            LEA     P_B,A1
+            MOVE.B  #14,D0
+            TRAP    #15
+            BRA     SHIFT_POSTSIZE
+SHIFT_ISWORD  
+            LEA     P_W,A1
+            MOVE.B  #14,D0
+            TRAP    #15 
+SHIFT_POSTSIZE
+            LEA     P_SPACE,A1
+            MOVE.B  #14,D0
+            TRAP    #15  
+            BTST    #5,D3
+            BEQ     SHIFT_ISREG
+            MOVE.W  D3,D1
+            ANDI.W  #$0E00,D1
+            ROL.W   #$07,D1
+            LEA     P_HASH,A1
+            MOVE.B  #14,D0
+            TRAP    #15
+            LEA     P_HEX,A1
+            MOVE.B  #14,D0
+            TRAP    #15
+            MOVE.W  D3,D1
+            ANDI.W  #$0E00,D1
+            ROL.W   #$07,D1
+            MOVE.B  #3,D0
+            TRAP    #15
+            BRA     SHIFT_END
+SHIFT_ISREG
+            MOVE.W  D3,D1
+            ANDI.W  #$0E00,D1
+            ROL.W   #$07,D1
+            JSR     M_DR
+            BRA     SHIFT_END 
+NOT_MY_PROBLEM
+            JSR     BAD
+SHIFT_END   
+            LEA     P_COMMA,A1
+            MOVE.B  #14,D0
+            TRAP    #15           
+            MOVE.W  D3,D1
+            ANDI.W  #$0007,D5
+            JSR     M_DR
+                    
             RTS 
+*-----------------------------------------------------------  
+SHIFT_MEM_PARAMETER_CHK
+            ;SIZE CHECK -> REGISTER INFO -> PRINT
+            LEA     P_PERIOD,A1
+            MOVE.B  #14,D0
+            TRAP    #15
+            LEA     P_W,A1
+            MOVE.B  #14,D0
+            TRAP    #15
+            LEA     P_SPACE,A1
+            MOVE.B  #14,D0
+            TRAP    #15
+            JSR     CHK_EA_SOURCE
+            RTS
 *-----------------------------------------------------------    
 M_DR    ;IF MODE IS A DATA REGISTER Dn           
             LEA     P_D,A1
@@ -785,52 +909,54 @@ ASR
        LEA      AR,A1
        MOVE.B   #14,D0
        TRAP     #15
-       JSR      SHIFT_ROTATION_PARAMETER_CHK
+       JSR      SHIFT_MEM_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------       
 ASL    
        LEA      AL,A1
        MOVE.B   #14,D0
        TRAP     #15
-       JSR      SHIFT_ROTATION_PARAMETER_CHK
+       JSR      SHIFT_MEM_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------       
 LSR    
        LEA      LR,A1
        MOVE.B   #14,D0
        TRAP     #15
-       JSR      SHIFT_ROTATION_PARAMETER_CHK
+       JSR      SHIFT_MEM_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------       
 LSL    
        LEA      LL,A1
        MOVE.B   #14,D0
        TRAP     #15
-       JSR      SHIFT_ROTATION_PARAMETER_CHK
+       JSR      SHIFT_MEM_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------       
 ROR    
        LEA      RR,A1
        MOVE.B   #14,D0
        TRAP     #15
-       JSR      SHIFT_ROTATION_PARAMETER_CHK
+       JSR      SHIFT_MEM_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------       
 ROL    
        LEA      RL,A1
        MOVE.B   #14,D0
        TRAP     #15
-       JSR      SHIFT_ROTATION_PARAMETER_CHK
+       JSR      SHIFT_MEM_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------
 SHIFT_TEST
-       CLR.L D3
-       MOVE.W (A4),D3
-       ROR.W #6,D3
-       ANDI.B #03,D3
-       CMP.B #3,D3
-       BEQ TESTBIT
-       BRA BAD
+       CLR.L    D3
+       MOVE.W   (A4),D3
+       ROR.W    #6,D3
+       ANDI.B   #03,D3
+       CMP.B    #3,D3
+       BEQ      TESTBIT
+       JSR      SHIFT_REG_PARAMETER_CHK
+       RTS
+       
 *-----------------------------------------------------------
 TESTBIT
        CLR.L    D3
