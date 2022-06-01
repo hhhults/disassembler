@@ -465,7 +465,7 @@ M_AWA   ;IF MODE IS AN ABSOLUTE WORD ADDRESS (xxx).W
             MOVE.B  #14,D0    
             TRAP    #15 
             
-            MOVE.L  (A4)+,D4
+            MOVE.W  (A4)+,D4
             JSR PRINTHEX
 
             RTS    
@@ -487,7 +487,7 @@ BAD
        TRAP     #15
        MOVE.L   D3,D4
        JSR      PRINTHEX
-       ADD.L    #$2,A4
+       ADD.L    #$4,A4
        RTS
 *-----------------------------------------------------------      
 MOVEB  
@@ -608,7 +608,7 @@ NOT
        RTS     
 *-----------------------------------------------------------
 LEA    
-       LEA      LA,A1        ;NOT WORKING RN*******************************************
+       LEA      LA,A1
        MOVE.B   #14,D0
        TRAP     #15
        MOVE.W   (A4),D3
@@ -709,24 +709,54 @@ BRA
        LEA      BR,A1
        MOVE.B   #14,D0
        TRAP     #15
+       JSR PRINT_DISPLACEMENT
        RTS
 *-----------------------------------------------------------
 BEQ    
        LEA      BE,A1
        MOVE.B   #14,D0
        TRAP     #15
+       JSR PRINT_DISPLACEMENT
        RTS
 *-----------------------------------------------------------       
 BGT    
        LEA      BG,A1
        MOVE.B   #14,D0
        TRAP     #15
+       JSR PRINT_DISPLACEMENT
        RTS
 *-----------------------------------------------------------       
 BLE    LEA      BL,A1
        MOVE.B   #14,D0
        TRAP     #15
+       JSR PRINT_DISPLACEMENT
        RTS
+*-----------------------------------------------------------
+PRINT_DISPLACEMENT
+      MOVE.W (A4),D3
+      CMP.B #0,D3
+      BEQ WORDDISP
+      CMP.B #$FF,D3
+      BEQ LONGDISP
+      CLR.L D4
+      MOVE.B D3,D4
+      EXT.W D4
+      ADDA.L #2,A4
+      ADD.W A4,D4
+      JSR PRINTHEX
+      RTS
+WORDDISP
+     ADDA.L #2,A4
+     MOVE.L A4,D4
+     ADD.W (A4)+,D4
+     JSR PRINTHEX
+     RTS
+LONGDISP
+     ADDA.L #2,A4
+     MOVE.L A4,D4
+     ADD.L (A4)+,D4
+     JSR PRINTHEX
+     RTS           
 *-----------------------------------------------------------       
 ASR    
        LEA      AR,A1
@@ -908,31 +938,31 @@ PROMPT1     DC.B    'Please enter the memory value of the start of the program: 
 PROMPT2     DC.B    'Please enter the memory value of the end of the program: ',0
 UNDEFINED   DC.B    'The program should never reach this state.',0
 BADDATA     DC.B    ' Data ',0
-MQ          DC.B    'MOVEQ ',0
-MB          DC.B    'MOVE.B ',0
-MAL         DC.B    'MOVEA.L ',0
-MAW         DC.B    'MOVEA.W ',0
-ML          DC.B    'MOVE.L ',0
-MW          DC.B    'MOVE.W ',0
-NP          DC.B    'NOP',0
-NT          DC.B    'NOT',0
-AQ          DC.B    'ADDQ ',0
-AN          DC.B    'AND',0
-AD          DC.B    'ADD',0
-BR          DC.B    'BRA ',0
-BE          DC.B    'BEQ ',0
-BG          DC.B    'BGT ',0
-BL          DC.B    'BLE ',0
-AR          DC.B    'ASR',0
-AL          DC.B    'ASL',0
-LA          DC.B    'LEA ',0
-LR          DC.B    'LSR',0
-LL          DC.B    'LSL',0
-RR          DC.B    'ROR',0
-RL          DC.B    'ROL',0
-SB          DC.B    'SUB',0
-JS          DC.B    'JSR ',0
-RT          DC.B    'RTS',0
+MQ          DC.B    ' MOVEQ ',0
+MB          DC.B    ' MOVE.B ',0
+MAL         DC.B    ' MOVEA.L ',0
+MAW         DC.B    ' MOVEA.W ',0
+ML          DC.B    ' MOVE.L ',0
+MW          DC.B    ' MOVE.W ',0
+NP          DC.B    ' NOP',0
+NT          DC.B    ' NOT',0
+AQ          DC.B    ' ADDQ ',0
+AN          DC.B    ' AND',0
+AD          DC.B    ' ADD',0
+BR          DC.B    ' BRA ',0
+BE          DC.B    ' BEQ ',0
+BG          DC.B    ' BGT ',0
+BL          DC.B    ' BLE ',0
+AR          DC.B    ' ASR',0
+AL          DC.B    ' ASL',0
+LA          DC.B    ' LEA ',0
+LR          DC.B    ' LSR',0
+LL          DC.B    ' LSL',0
+RR          DC.B    ' ROR',0
+RL          DC.B    ' ROL',0
+SB          DC.B    ' SUB',0
+JS          DC.B    ' JSR ',0
+RT          DC.B    ' RTS',0
 
 ;necessary symbols for displaying EA's
 P_A         DC.B    'A',0
@@ -956,6 +986,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 
 
