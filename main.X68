@@ -8,7 +8,7 @@
 START:
         *JSR        WELCOME
         MOVEA.L     #$5000,A2    * for testing
-        MOVEA.L     #$5023,A3
+        MOVEA.L     #$500B,A3
         MOVEA.L     #$00000500,A5
         MOVEA.L     A2,A4      * does this need to be W depending on where in mem start is?
         JSR         BUILD_EA_TREE
@@ -352,8 +352,8 @@ SHIFT_REG_PARAMETER_CHK
             MOVEA.L D5,A4
             CLR.L   D5
             MOVE.W  D3,D5
-            ADDI.W  #$0018,D5
-            LSR.W   #2,D5
+            ANDI.W  #$0018,D5
+            LSR.W   #3,D5
             CMP     #0,D5
             BEQ     SHIFT_ASD
             CMP     #1,D5
@@ -427,7 +427,7 @@ SHIFT_POSTSIZE
             MOVE.B  #14,D0
             TRAP    #15  
             BTST    #5,D3
-            BEQ     SHIFT_ISREG
+            BNE     SHIFT_ISREG
             MOVE.W  D3,D1
             ANDI.W  #$0E00,D1
             ROL.W   #$07,D1
@@ -454,9 +454,10 @@ NOT_MY_PROBLEM
 SHIFT_END   
             LEA     P_COMMA,A1
             MOVE.B  #14,D0
-            TRAP    #15           
+            TRAP    #15 
+            CLR.L   D1
             MOVE.W  D3,D1
-            ANDI.W  #$0007,D5
+            ANDI.W  #$0007,D1
             JSR     M_DR
                     
             RTS 
@@ -950,9 +951,10 @@ ROL
 SHIFT_TEST
        CLR.L    D3
        MOVE.W   (A4),D3
-       ROR.W    #6,D3
-       ANDI.B   #03,D3
-       CMP.B    #3,D3
+       MOVE.W   D3,D5
+       ROR.W    #6,D5
+       ANDI.B   #03,D5
+       CMP.B    #3,D5
        BEQ      TESTBIT
        JSR      SHIFT_REG_PARAMETER_CHK
        RTS

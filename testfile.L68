@@ -1,6 +1,6 @@
 00005000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 6/1/2022 2:19:26 PM
+Created On: 6/1/2022 4:35:47 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :test file
@@ -17,37 +17,37 @@ Created On: 6/1/2022 2:19:26 PM
 00005000                            13  ;   ADD.L    D5,$9000
 00005000                            14  ;   ADD.L    $9000,D5
 00005000                            15  ;   AND.B    #$12,D1
-00005000  E2BD                      16     ROR.L    D1,D5
-00005002  E69D                      17     ROR.L    #$3,D5
-00005004  E27D                      18     ROR.W    D1,D5
-00005006  E65D                      19     ROR.W    #$3,D5
-00005008  E23D                      20     ROR.B    D1,D5
-0000500A  E61D                      21     ROR.B    #$3,D5
-0000500C  E5A3                      22     ASL.L    D2,D3
-0000500E  E583                      23     ASL.L    #$2,D3
-00005010  E563                      24     ASL.W    D2,D3
-00005012  E543                      25     ASL.W    #$2,D3
-00005014  E523                      26     ASL.B    D2,D3
-00005016  E503                      27     ASL.B    #$2,D3
-00005018  EDAF                      28     LSL.L    D6,D7
-0000501A  EB8F                      29     LSL.L    #$5,D7
-0000501C  ED6F                      30     LSL.W    D6,D7
-0000501E  EB4F                      31     LSL.W    #$5,D7
-00005020  ED2F                      32     LSL.B    D6,D7
-00005022  EB0F                      33     LSL.B    #$5,D7
-00005024                            34     
-00005024                            35  ;    NOT D0
-00005024                            36  ;    NOP
-00005024                            37  ;    LEA DONE,A1
-00005024                            38  ;    JSR DONE
-00005024                            39  ;    SIMHALT             ; halt simulator
-00005024                            40  
-00005024                            41  
-00005024                            42  ;DONE MOVE.B #$F,D0
-00005024                            43  ;     RTS           
-00005024                            44  * Put variables and constants here
-00005024                            45  
-00005024                            46      END    START        ; last line of source
+00005000                            16  ;   ROR.L    D1,D5
+00005000                            17   ;  ROR.L    #$3,D5
+00005000                            18  ;   ROR.W    D1,D5
+00005000                            19  ;   ROR.W    #$3,D5
+00005000                            20  ;   ROR.B    D1,D5
+00005000                            21  ;   ROR.B    #$3,D5
+00005000                            22  ;   ASL.L    D2,D3
+00005000                            23  ;   ASL.L    #$2,D3
+00005000                            24  ;   ASL.W    D2,D3
+00005000                            25  ;   ASL.W    #$2,D3
+00005000                            26  ;   ASL.B    D2,D3
+00005000                            27  ;   ASL.B    #$2,D3
+00005000  EDAF                      28     LSL.L    D6,D7
+00005002  EB8F                      29     LSL.L    #$5,D7
+00005004  ED6F                      30     LSL.W    D6,D7
+00005006  EB4F                      31     LSL.W    #$5,D7
+00005008  ED2F                      32     LSL.B    D6,D7
+0000500A  EB0F                      33     LSL.B    #$5,D7
+0000500C                            34     
+0000500C                            35  ;    NOT D0
+0000500C                            36  ;    NOP
+0000500C                            37  ;    LEA DONE,A1
+0000500C                            38  ;    JSR DONE
+0000500C                            39  ;    SIMHALT             ; halt simulator
+0000500C                            40  
+0000500C                            41  
+0000500C                            42  ;DONE MOVE.B #$F,D0
+0000500C                            43  ;     RTS           
+0000500C                            44  * Put variables and constants here
+0000500C                            45  
+0000500C                            46      END    START        ; last line of source
 
 No errors detected
 No warnings generated
