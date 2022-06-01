@@ -8,17 +8,20 @@
 START:
         *JSR        WELCOME
         MOVEA.L     #$5000,A2    * for testing
-        MOVEA.L     #$5020,A3
+        MOVEA.L     #$5023,A3
         MOVEA.L     #$00000500,A5
         MOVEA.L     A2,A4      * does this need to be W depending on where in mem start is?
         JSR         BUILD_EA_TREE
         JSR         BUILDTREE
-        CLR.B D2
-        JSR BLOCK_OUT    
+        CLR.B       D2
+        JSR         BLOCK_OUT    
     
 NEXTLINE
-        MOVE.W A4,D4
-        JSR PRINTHEX 
+        CLR.L       D4
+        CLR.L       D5
+        CLR.L       D6
+        MOVE.W      A4,D4
+        JSR         PRINTHEX 
         JSR         DECODE_OP
         CMP.L       A4,A3
         BLE         DONE
@@ -28,17 +31,21 @@ NEXTLINE
         RTS
 
 BLOCK_OUT
-        MOVE.B D2,-(SP)
-        JSR NEXTLINE
-        MOVE.B (SP)+,D2
-        CMPA.L END,A4
-        BLE DONE
-        ADDQ #1,D2
-        CMP.B #$20,D2
-        BNE BLOCK_OUT
+        MOVE.B      D2,-(SP)
+        JSR         NEXTLINE
+        MOVE.B      (SP)+,D2    
+        CMPA.L      END,A4
+        BLE         DONE
+        ADDQ        #1,D2
+        CMP.B       #$20,D2
+        BNE         BLOCK_OUT
         RTS
 
 DONE                * end program
+        LEA         NXT_LINE,A1
+        MOVE        #13,D0
+        TRAP        #15
+
         LEA DONEMSG,A1
         MOVE.B #14,D0
         TRAP #15
@@ -1003,6 +1010,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 
 

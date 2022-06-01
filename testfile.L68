@@ -1,6 +1,6 @@
 00005000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 5/31/2022 5:08:53 PM
+Created On: 6/1/2022 2:19:26 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :test file
@@ -11,24 +11,43 @@ Created On: 5/31/2022 5:08:53 PM
 00005000                             7      ORG    $5000
 00005000                             8  START:                  ; first instruction of program
 00005000                             9  
-00005000  283C 00201010             10     MOVE.L   #$00201010,D4
-00005006  DA44                      11     ADD.W    D4,D5
-00005008  DDC5                      12     ADDA.L   D5,A6
-0000500A  DBB9 00009000             13     ADD.L    D5,$9000
-00005010  DAB9 00009000             14     ADD.L    $9000,D5
-00005016  C23C 0012                 15     AND.B    #$12,D1
-0000501A                            16  ;    NOT D0
-0000501A                            17  ;    NOP
-0000501A                            18  ;    LEA DONE,A1
-0000501A                            19  ;    JSR DONE
-0000501A                            20  ;    SIMHALT             ; halt simulator
-0000501A                            21  
-0000501A                            22  
-0000501A                            23  ;DONE MOVE.B #$F,D0
-0000501A                            24  ;     RTS           
-0000501A                            25  * Put variables and constants here
-0000501A                            26  
-0000501A                            27      END    START        ; last line of source
+00005000                            10  ;   MOVE.L   #$00201010,D4
+00005000                            11  ;   ADD.W    D4,D5
+00005000                            12  ;   ADDA.L   D5,A6
+00005000                            13  ;   ADD.L    D5,$9000
+00005000                            14  ;   ADD.L    $9000,D5
+00005000                            15  ;   AND.B    #$12,D1
+00005000  E2BD                      16     ROR.L    D1,D5
+00005002  E69D                      17     ROR.L    #$3,D5
+00005004  E27D                      18     ROR.W    D1,D5
+00005006  E65D                      19     ROR.W    #$3,D5
+00005008  E23D                      20     ROR.B    D1,D5
+0000500A  E61D                      21     ROR.B    #$3,D5
+0000500C  E5A3                      22     ASL.L    D2,D3
+0000500E  E583                      23     ASL.L    #$2,D3
+00005010  E563                      24     ASL.W    D2,D3
+00005012  E543                      25     ASL.W    #$2,D3
+00005014  E523                      26     ASL.B    D2,D3
+00005016  E503                      27     ASL.B    #$2,D3
+00005018  EDAF                      28     LSL.L    D6,D7
+0000501A  EB8F                      29     LSL.L    #$5,D7
+0000501C  ED6F                      30     LSL.W    D6,D7
+0000501E  EB4F                      31     LSL.W    #$5,D7
+00005020  ED2F                      32     LSL.B    D6,D7
+00005022  EB0F                      33     LSL.B    #$5,D7
+00005024                            34     
+00005024                            35  ;    NOT D0
+00005024                            36  ;    NOP
+00005024                            37  ;    LEA DONE,A1
+00005024                            38  ;    JSR DONE
+00005024                            39  ;    SIMHALT             ; halt simulator
+00005024                            40  
+00005024                            41  
+00005024                            42  ;DONE MOVE.B #$F,D0
+00005024                            43  ;     RTS           
+00005024                            44  * Put variables and constants here
+00005024                            45  
+00005024                            46      END    START        ; last line of source
 
 No errors detected
 No warnings generated
