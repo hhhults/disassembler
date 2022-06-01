@@ -8,11 +8,13 @@
 START:
         *JSR        WELCOME
         MOVEA.L     #$5000,A2    * for testing
-        MOVEA.L     #$5019,A3
+        MOVEA.L     #$5020,A3
         MOVEA.L     #$00000500,A5
         MOVEA.L     A2,A4      * does this need to be W depending on where in mem start is?
         JSR         BUILD_EA_TREE
-        JSR         BUILDTREE    
+        JSR         BUILDTREE
+        CLR.B D2
+        JSR BLOCK_OUT    
     
 NEXTLINE
         MOVE.W A4,D4
@@ -23,9 +25,23 @@ NEXTLINE
         LEA         NXT_LINE,A1
         MOVE        #13,D0
         TRAP        #15
-        BRA         NEXTLINE
+        RTS
+
+BLOCK_OUT
+        MOVE.B D2,-(SP)
+        JSR NEXTLINE
+        MOVE.B (SP)+,D2
+        CMPA.L END,A4
+        BLE DONE
+        ADDQ #1,D2
+        CMP.B #$20,D2
+        BNE BLOCK_OUT
+        RTS
 
 DONE                * end program
+        LEA DONEMSG,A1
+        MOVE.B #14,D0
+        TRAP #15
         MOVE.B      #9,D0
         TRAP        #15
     
@@ -321,136 +337,12 @@ LOGIC_DONE
              
             RTS   
 *-----------------------------------------------------------  
-SHIFT_REG_PARAMETER_CHK  
-            ;ROTATION VALUE CHECK
+SHIFT_ROTATION_PARAMETER_CHK  
             CLR.L   D5
             MOVE.L  A4,D5
             ADDQ    #$2,D5
             MOVEA.L D5,A4
-            CLR.L   D5
-            MOVE.W  D3,D5
-            ADDI.W  #$0018,D5
-            LSR.W   #2,D5
-            CMP     #0,D5
-            BEQ     SHIFT_ASD
-            CMP     #1,D5
-            BEQ     SHIFT_LSD
-            CMP     #2,D5
-            BEQ     NOT_MY_PROBLEM
-            CMP     #3,D5
-            BEQ     SHIFT_ROD
-SHIFT_ASD
-            BTST    #$8,D3
-            BEQ     ASD_LEFT
-            LEA     AR,A1
-            MOVE    #14,D0
-            TRAP    #15
-            BRA     SHIFT_SIZE
-ASD_LEFT
-            LEA     AL,A1
-            MOVE    #14,D0
-            TRAP    #15
-            BRA     SHIFT_SIZE            
-SHIFT_LSD
-            BTST    #$8,D3
-            BEQ     LSD_LEFT
-            LEA     LR,A1
-            MOVE    #14,D0
-            TRAP    #15
-            BRA     SHIFT_SIZE
-LSD_LEFT
-            LEA     LL,A1
-            MOVE    #14,D0
-            TRAP    #15
-            BRA     SHIFT_SIZE
-SHIFT_ROD
-            BTST    #$8,D3
-            BEQ     ROD_LEFT
-            LEA     RR,A1
-            MOVE    #14,D0
-            TRAP    #15
-            BRA     SHIFT_SIZE
-ROD_LEFT
-            LEA     RL,A1
-            MOVE    #14,D0
-            TRAP    #15
-SHIFT_SIZE
-            LEA     P_PERIOD,A1
-            MOVE.B  #14,D0
-            TRAP    #15
-            CLR.L   D5
-            MOVE.W  D3,D5
-            ANDI.W  #$00C0,D5
-            LSR.W   #6,D5
-            CMP     #0,D5
-            BEQ     SHIFT_ISBYTE
-            CMP     #1,D5
-            BEQ     SHIFT_ISWORD
-            LEA     P_L,A1
-            MOVE.B  #14,D0
-            TRAP    #15
-            BRA     SHIFT_POSTSIZE
-SHIFT_ISBYTE
-            LEA     P_B,A1
-            MOVE.B  #14,D0
-            TRAP    #15
-            BRA     SHIFT_POSTSIZE
-SHIFT_ISWORD  
-            LEA     P_W,A1
-            MOVE.B  #14,D0
-            TRAP    #15 
-SHIFT_POSTSIZE
-            LEA     P_SPACE,A1
-            MOVE.B  #14,D0
-            TRAP    #15  
-            BTST    #5,D3
-            BEQ     SHIFT_ISREG
-            MOVE.W  D3,D1
-            ANDI.W  #$0E00,D1
-            ROL.W   #$07,D1
-            LEA     P_HASH,A1
-            MOVE.B  #14,D0
-            TRAP    #15
-            LEA     P_HEX,A1
-            MOVE.B  #14,D0
-            TRAP    #15
-            MOVE.W  D3,D1
-            ANDI.W  #$0E00,D1
-            ROL.W   #$07,D1
-            MOVE.B  #3,D0
-            TRAP    #15
-            BRA     SHIFT_END
-SHIFT_ISREG
-            MOVE.W  D3,D1
-            ANDI.W  #$0E00,D1
-            ROL.W   #$07,D1
-            JSR     M_DR
-            BRA     SHIFT_END 
-NOT_MY_PROBLEM
-            JSR     BAD
-SHIFT_END   
-            LEA     P_COMMA,A1
-            MOVE.B  #14,D0
-            TRAP    #15           
-            MOVE.W  D3,D1
-            ANDI.W  #$0007,D5
-            JSR     M_DR
-                    
             RTS 
-*-----------------------------------------------------------  
-SHIFT_MEM_PARAMETER_CHK
-            ;SIZE CHECK -> REGISTER INFO -> PRINT
-            LEA     P_PERIOD,A1
-            MOVE.B  #14,D0
-            TRAP    #15
-            LEA     P_W,A1
-            MOVE.B  #14,D0
-            TRAP    #15
-            LEA     P_SPACE,A1
-            MOVE.B  #14,D0
-            TRAP    #15
-            JSR     CHK_EA_SOURCE
-            RTS
 *-----------------------------------------------------------    
 M_DR    ;IF MODE IS A DATA REGISTER Dn           
             LEA     P_D,A1
@@ -589,7 +481,7 @@ M_AWA   ;IF MODE IS AN ABSOLUTE WORD ADDRESS (xxx).W
             MOVE.B  #14,D0    
             TRAP    #15 
             
-            MOVE.L  (A4)+,D4
+            MOVE.W  (A4)+,D4
             JSR PRINTHEX
 
             RTS    
@@ -611,7 +503,7 @@ BAD
        TRAP     #15
        MOVE.L   D3,D4
        JSR      PRINTHEX
-       ADD.L    #$2,A4
+       ADD.L    #$4,A4
        RTS
 *-----------------------------------------------------------      
 MOVEB  
@@ -732,7 +624,7 @@ NOT
        RTS     
 *-----------------------------------------------------------
 LEA    
-       LEA      LA,A1        ;NOT WORKING RN*******************************************
+       LEA      LA,A1
        MOVE.B   #14,D0
        TRAP     #15
        MOVE.W   (A4),D3
@@ -833,76 +725,105 @@ BRA
        LEA      BR,A1
        MOVE.B   #14,D0
        TRAP     #15
+       JSR PRINT_DISPLACEMENT
        RTS
 *-----------------------------------------------------------
 BEQ    
        LEA      BE,A1
        MOVE.B   #14,D0
        TRAP     #15
+       JSR PRINT_DISPLACEMENT
        RTS
 *-----------------------------------------------------------       
 BGT    
        LEA      BG,A1
        MOVE.B   #14,D0
        TRAP     #15
+       JSR PRINT_DISPLACEMENT
        RTS
 *-----------------------------------------------------------       
 BLE    LEA      BL,A1
        MOVE.B   #14,D0
        TRAP     #15
+       JSR PRINT_DISPLACEMENT
        RTS
+*-----------------------------------------------------------
+PRINT_DISPLACEMENT
+      MOVE.W (A4),D3
+      CMP.B #0,D3
+      BEQ WORDDISP
+      CMP.B #$FF,D3
+      BEQ LONGDISP
+      CLR.L D4
+      MOVE.B D3,D4
+      EXT.W D4
+      ADDA.L #2,A4
+      ADD.W A4,D4
+      JSR PRINTHEX
+      RTS
+WORDDISP
+     ADDA.L #2,A4
+     MOVE.L A4,D4
+     ADD.W (A4)+,D4
+     JSR PRINTHEX
+     RTS
+LONGDISP
+     ADDA.L #2,A4
+     MOVE.L A4,D4
+     ADD.L (A4)+,D4
+     JSR PRINTHEX
+     RTS           
 *-----------------------------------------------------------       
 ASR    
        LEA      AR,A1
        MOVE.B   #14,D0
        TRAP     #15
-       JSR      SHIFT_MEM_PARAMETER_CHK
+       JSR      SHIFT_ROTATION_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------       
 ASL    
        LEA      AL,A1
        MOVE.B   #14,D0
        TRAP     #15
-       JSR      SHIFT_MEM_PARAMETER_CHK
+       JSR      SHIFT_ROTATION_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------       
 LSR    
        LEA      LR,A1
        MOVE.B   #14,D0
        TRAP     #15
-       JSR      SHIFT_MEM_PARAMETER_CHK
+       JSR      SHIFT_ROTATION_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------       
 LSL    
        LEA      LL,A1
        MOVE.B   #14,D0
        TRAP     #15
-       JSR      SHIFT_MEM_PARAMETER_CHK
+       JSR      SHIFT_ROTATION_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------       
 ROR    
        LEA      RR,A1
        MOVE.B   #14,D0
        TRAP     #15
-       JSR      SHIFT_MEM_PARAMETER_CHK
+       JSR      SHIFT_ROTATION_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------       
 ROL    
        LEA      RL,A1
        MOVE.B   #14,D0
        TRAP     #15
-       JSR      SHIFT_MEM_PARAMETER_CHK
+       JSR      SHIFT_ROTATION_PARAMETER_CHK
        RTS
 *-----------------------------------------------------------
 SHIFT_TEST
-       CLR.L    D3
-       MOVE.W   (A4),D3
-       ROR.W    #6,D3
-       ANDI.B   #03,D3
-       CMP.B    #3,D3
-       BEQ      TESTBIT
-       JSR      SHIFT_REG_PARAMETER_CHK
-       RTS
+       CLR.L D3
+       MOVE.W (A4),D3
+       ROR.W #6,D3
+       ANDI.B #03,D3
+       CMP.B #3,D3
+       BEQ TESTBIT
+       BRA BAD
 *-----------------------------------------------------------
 TESTBIT
        CLR.L    D3
@@ -1023,8 +944,8 @@ IF_F
 * var storage
 TREE        DC.L    $7000  
 EA_TREE     DC.L    $0500
-BEGIN       DS.L    $FFFF
-END         DS.L    $FFFF  
+BEGIN       DS.L    $5000
+END         DS.L    $6000  
 * string storage
 CR          EQU     $0D
 LF          EQU     $09
@@ -1032,32 +953,33 @@ NEWLINE     DC.B    '',CR,LF,0
 PROMPT1     DC.B    'Please enter the memory value of the start of the program: ',0
 PROMPT2     DC.B    'Please enter the memory value of the end of the program: ',0
 UNDEFINED   DC.B    'The program should never reach this state.',0
+DONEMSG     DC.B    'You have reached the end of the disassembler.',0
 BADDATA     DC.B    ' Data ',0
-MQ          DC.B    'MOVEQ ',0
-MB          DC.B    'MOVE.B ',0
-MAL         DC.B    'MOVEA.L ',0
-MAW         DC.B    'MOVEA.W ',0
-ML          DC.B    'MOVE.L ',0
-MW          DC.B    'MOVE.W ',0
-NP          DC.B    'NOP',0
-NT          DC.B    'NOT',0
-AQ          DC.B    'ADDQ ',0
-AN          DC.B    'AND',0
-AD          DC.B    'ADD',0
-BR          DC.B    'BRA ',0
-BE          DC.B    'BEQ ',0
-BG          DC.B    'BGT ',0
-BL          DC.B    'BLE ',0
-AR          DC.B    'ASR',0
-AL          DC.B    'ASL',0
-LA          DC.B    'LEA ',0
-LR          DC.B    'LSR',0
-LL          DC.B    'LSL',0
-RR          DC.B    'ROR',0
-RL          DC.B    'ROL',0
-SB          DC.B    'SUB',0
-JS          DC.B    'JSR ',0
-RT          DC.B    'RTS',0
+MQ          DC.B    ' MOVEQ ',0
+MB          DC.B    ' MOVE.B ',0
+MAL         DC.B    ' MOVEA.L ',0
+MAW         DC.B    ' MOVEA.W ',0
+ML          DC.B    ' MOVE.L ',0
+MW          DC.B    ' MOVE.W ',0
+NP          DC.B    ' NOP',0
+NT          DC.B    ' NOT',0
+AQ          DC.B    ' ADDQ ',0
+AN          DC.B    ' AND',0
+AD          DC.B    ' ADD',0
+BR          DC.B    ' BRA ',0
+BE          DC.B    ' BEQ ',0
+BG          DC.B    ' BGT ',0
+BL          DC.B    ' BLE ',0
+AR          DC.B    ' ASR',0
+AL          DC.B    ' ASL',0
+LA          DC.B    ' LEA ',0
+LR          DC.B    ' LSR',0
+LL          DC.B    ' LSL',0
+RR          DC.B    ' ROR',0
+RL          DC.B    ' ROL',0
+SB          DC.B    ' SUB',0
+JS          DC.B    ' JSR ',0
+RT          DC.B    ' RTS',0
 
 ;necessary symbols for displaying EA's
 P_A         DC.B    'A',0
