@@ -802,9 +802,36 @@ SUB
        MOVE.B   #14,D0
        TRAP     #15       
        JSR      LOGIC_SIZE_CHK 
+     
+       BTST     #$08,D5
+       BEQ      BAD_SUB_MODE       
+SUB_BACK       
        MOVE.L   #6,D6  
        JSR      LOGIC_PARAMETER_CHK    
-       RTS      
+
+       RTS  
+       
+BAD_SUB_MODE
+       CLR.L    D5
+       MOVE.W   D3,D5
+       ANDI.W   #$0038,D5
+       LSR.W    #$03,D5
+       CMP      #$00,D5
+       BEQ      P_BAD_SUB_MODE
+       CMP      #$01,D5
+       BEQ      P_BAD_SUB_MODE
+       MOVE.W   D3,D5
+       ANDI.W   #$003F,D5
+       CMP      #$3C,D5
+       BEQ      P_BAD_SUB_MODE
+       BRA      SUB_BACK 
+P_BAD_SUB_MODE
+       LEA     INVALIDMODE,A1
+       MOVE.B  #14,D0
+       TRAP    #15
+       ADDA.L  #$02,A4
+       RTS
+
 *-----------------------------------------------------------      
 NOPETC 
        MOVE.W   (A4),D3
