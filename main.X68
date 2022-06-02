@@ -20,7 +20,7 @@ LOOP
         MOVE.B      #14,D0
         LEA         IOMSG,A1
         TRAP        #15
-        
+        MOVEA.L     #0,A1
         MOVE.B      #2,D0
         TRAP        #15
         BRA         LOOP    
@@ -1046,6 +1046,7 @@ NOT_ZERO  * if bit D2 of (A4) is one (go right on tree)
 * GETINPUT: gets hex value in ascii from user, puts it in D3   
 GETINPUT
        CLR.L D3
+       MOVEA.L  #0,A1
        MOVE.B   #2,D0     * get user string
        TRAP     #15      
 
