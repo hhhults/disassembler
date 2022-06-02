@@ -152,9 +152,32 @@ TEST_BACK
     ADD.W    $9000,D5
     ADD.B    D5,$9000
     ADD.B    $9000,D5
+    ;AND INSTRUCTION TESTS
+    AND.B    D1,$9000
+    AND.B    $00009000,D1
+    AND.B    D1,$00009000
+    AND.B    $9000,D1
+    AND.B    D1,(A4)
+    AND.B    D1,-(A4)
+    AND.B    D1,(A4)+
+    AND.W    D1,$9000
+    AND.W    $00009000,D1
+    AND.W    D1,$00009000
+    AND.W    $9000,D1
+    AND.W    D1,(A4)
+    AND.W    D1,-(A4)
+    AND.W    D1,(A4)+
+    AND.L    D1,$9000
+    AND.L    $00009000,D1
+    AND.L    D1,$00009000
+    AND.L    $9000,D1
+    AND.L    D1,(A4)
+    AND.L    D1,-(A4)
+    AND.L    D1,(A4)+
     ;ADDA INSTRUCTION TESTS
-   ADDA.L   D5,A6
-   AND.B    #$12,D1
+    ADDA.L   D5,A6
+    ADDA.W   D5,A6
+   ;ROd,ASd/LSd INSTRUCTION TESTS
    ROR.L    D1,D5
    ROR.L    #$3,D5
    ROR.W    D1,D5

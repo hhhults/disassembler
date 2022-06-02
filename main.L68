@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 6/2/2022 2:00:27 AM
+Created On: 6/2/2022 2:38:25 AM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : motorola 68k disassembler prototype
@@ -12,7 +12,7 @@ Created On: 6/2/2022 2:00:27 AM
 00001000                             8  START:
 00001000                             9          *JSR        WELCOME
 00001000  247C 00005000             10          MOVEA.L     #$5000,A2    * for testing
-00001006  267C 00005305             11          MOVEA.L     #$5305,A3
+00001006  267C 0000527D             11          MOVEA.L     #$527D,A3
 0000100C  2A7C 00000500             12          MOVEA.L     #$00000500,A5
 00001012  284A                      13          MOVEA.L     A2,A4      * does this need to be W depending on where in mem start is?
 00001014  4EB9 00001264             14          JSR         BUILD_EA_TREE

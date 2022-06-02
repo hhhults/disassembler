@@ -1,6 +1,6 @@
 00005000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 6/2/2022 2:00:16 AM
+Created On: 6/2/2022 2:37:43 AM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :test file
@@ -12,7 +12,7 @@ Created On: 6/2/2022 2:00:16 AM
 00005000                             8  START:                  ; NEED Bcc TESTS *************************************** <--- *|||||
 00005000                             9  
 00005000  4E71                      10     NOP
-00005002  6000 0218                 11     BRA  TEST_BRA
+00005002  6000 0270                 11     BRA  TEST_BRA
 00005006                            12     
 00005006                            13  TEST_BACK
 00005006  287C 00005000             14      MOVEA.L  #$00005000,A4
@@ -156,42 +156,65 @@ Created On: 6/2/2022 2:00:16 AM
 000051CC  DA79 00009000            152      ADD.W    $9000,D5
 000051D2  DB39 00009000            153      ADD.B    D5,$9000
 000051D8  DA39 00009000            154      ADD.B    $9000,D5
-000051DE                           155      ;ADDA INSTRUCTION TESTS
-000051DE  DDC5                     156     ADDA.L   D5,A6
-000051E0  C23C 0012                157     AND.B    #$12,D1
-000051E4  E2BD                     158     ROR.L    D1,D5
-000051E6  E69D                     159     ROR.L    #$3,D5
-000051E8  E27D                     160     ROR.W    D1,D5
-000051EA  E65D                     161     ROR.W    #$3,D5
-000051EC  E23D                     162     ROR.B    D1,D5
-000051EE  E61D                     163     ROR.B    #$3,D5
-000051F0  E5A3                     164     ASL.L    D2,D3
-000051F2  E583                     165     ASL.L    #$2,D3
-000051F4  E563                     166     ASL.W    D2,D3
-000051F6  E543                     167     ASL.W    #$2,D3
-000051F8  E523                     168     ASL.B    D2,D3
-000051FA  E503                     169     ASL.B    #$2,D3
-000051FC  EDAF                     170     LSL.L    D6,D7
-000051FE  EB8F                     171     LSL.L    #$5,D7
-00005200  ED6F                     172     LSL.W    D6,D7
-00005202  EB4F                     173     LSL.W    #$5,D7
-00005204  ED2F                     174     LSL.B    D6,D7
-00005206  EB0F                     175     LSL.B    #$5,D7
-00005208                           176     
-00005208  4640                     177      NOT D0
-0000520A  4E71                     178      NOP
-0000520C  43F9 00005220            179      LEA DONE,A1
-00005212  4EB9 00005220            180      JSR DONE
-00005218  FFFF FFFF                181      SIMHALT             ; halt simulator
-0000521C                           182  
-0000521C                           183  TEST_BRA
-0000521C                           184      
-0000521C  6000 FDE8                185      BRA TEST_BACK
-00005220  103C 000F                186  DONE MOVE.B #$F,D0
-00005224  4E75                     187       RTS           
-00005226                           188  * Put variables and constants here
-00005226                           189  
-00005226                           190      END    START        ; last line of source
+000051DE                           155      ;AND INSTRUCTION TESTS
+000051DE  C339 00009000            156      AND.B    D1,$9000
+000051E4  C239 00009000            157      AND.B    $00009000,D1
+000051EA  C339 00009000            158      AND.B    D1,$00009000
+000051F0  C239 00009000            159      AND.B    $9000,D1
+000051F6  C314                     160      AND.B    D1,(A4)
+000051F8  C324                     161      AND.B    D1,-(A4)
+000051FA  C31C                     162      AND.B    D1,(A4)+
+000051FC  C379 00009000            163      AND.W    D1,$9000
+00005202  C279 00009000            164      AND.W    $00009000,D1
+00005208  C379 00009000            165      AND.W    D1,$00009000
+0000520E  C279 00009000            166      AND.W    $9000,D1
+00005214  C354                     167      AND.W    D1,(A4)
+00005216  C364                     168      AND.W    D1,-(A4)
+00005218  C35C                     169      AND.W    D1,(A4)+
+0000521A  C3B9 00009000            170      AND.L    D1,$9000
+00005220  C2B9 00009000            171      AND.L    $00009000,D1
+00005226  C3B9 00009000            172      AND.L    D1,$00009000
+0000522C  C2B9 00009000            173      AND.L    $9000,D1
+00005232  C394                     174      AND.L    D1,(A4)
+00005234  C3A4                     175      AND.L    D1,-(A4)
+00005236  C39C                     176      AND.L    D1,(A4)+
+00005238                           177      ;ADDA INSTRUCTION TESTS
+00005238  DDC5                     178      ADDA.L   D5,A6
+0000523A  DCC5                     179      ADDA.W   D5,A6
+0000523C                           180     ;ROd,ASd/LSd INSTRUCTION TESTS
+0000523C  E2BD                     181     ROR.L    D1,D5
+0000523E  E69D                     182     ROR.L    #$3,D5
+00005240  E27D                     183     ROR.W    D1,D5
+00005242  E65D                     184     ROR.W    #$3,D5
+00005244  E23D                     185     ROR.B    D1,D5
+00005246  E61D                     186     ROR.B    #$3,D5
+00005248  E5A3                     187     ASL.L    D2,D3
+0000524A  E583                     188     ASL.L    #$2,D3
+0000524C  E563                     189     ASL.W    D2,D3
+0000524E  E543                     190     ASL.W    #$2,D3
+00005250  E523                     191     ASL.B    D2,D3
+00005252  E503                     192     ASL.B    #$2,D3
+00005254  EDAF                     193     LSL.L    D6,D7
+00005256  EB8F                     194     LSL.L    #$5,D7
+00005258  ED6F                     195     LSL.W    D6,D7
+0000525A  EB4F                     196     LSL.W    #$5,D7
+0000525C  ED2F                     197     LSL.B    D6,D7
+0000525E  EB0F                     198     LSL.B    #$5,D7
+00005260                           199     
+00005260  4640                     200      NOT D0
+00005262  4E71                     201      NOP
+00005264  43F9 00005278            202      LEA DONE,A1
+0000526A  4EB9 00005278            203      JSR DONE
+00005270  FFFF FFFF                204      SIMHALT             ; halt simulator
+00005274                           205  
+00005274                           206  TEST_BRA
+00005274                           207      
+00005274  6000 FD90                208      BRA TEST_BACK
+00005278  103C 000F                209  DONE MOVE.B #$F,D0
+0000527C  4E75                     210       RTS           
+0000527E                           211  * Put variables and constants here
+0000527E                           212  
+0000527E                           213      END    START        ; last line of source
 
 No errors detected
 No warnings generated
@@ -200,7 +223,7 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-DONE                5220
+DONE                5278
 START               5000
 TEST_BACK           5006
-TEST_BRA            521C
+TEST_BRA            5274
