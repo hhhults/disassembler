@@ -1,6 +1,6 @@
 00005000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 6/1/2022 4:35:47 PM
+Created On: 6/1/2022 5:15:10 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :test file
@@ -11,43 +11,43 @@ Created On: 6/1/2022 4:35:47 PM
 00005000                             7      ORG    $5000
 00005000                             8  START:                  ; first instruction of program
 00005000                             9  
-00005000                            10  ;   MOVE.L   #$00201010,D4
-00005000                            11  ;   ADD.W    D4,D5
-00005000                            12  ;   ADDA.L   D5,A6
-00005000                            13  ;   ADD.L    D5,$9000
-00005000                            14  ;   ADD.L    $9000,D5
-00005000                            15  ;   AND.B    #$12,D1
-00005000                            16  ;   ROR.L    D1,D5
-00005000                            17   ;  ROR.L    #$3,D5
-00005000                            18  ;   ROR.W    D1,D5
-00005000                            19  ;   ROR.W    #$3,D5
-00005000                            20  ;   ROR.B    D1,D5
-00005000                            21  ;   ROR.B    #$3,D5
-00005000                            22  ;   ASL.L    D2,D3
-00005000                            23  ;   ASL.L    #$2,D3
-00005000                            24  ;   ASL.W    D2,D3
-00005000                            25  ;   ASL.W    #$2,D3
-00005000                            26  ;   ASL.B    D2,D3
-00005000                            27  ;   ASL.B    #$2,D3
-00005000  EDAF                      28     LSL.L    D6,D7
-00005002  EB8F                      29     LSL.L    #$5,D7
-00005004  ED6F                      30     LSL.W    D6,D7
-00005006  EB4F                      31     LSL.W    #$5,D7
-00005008  ED2F                      32     LSL.B    D6,D7
-0000500A  EB0F                      33     LSL.B    #$5,D7
-0000500C                            34     
-0000500C                            35  ;    NOT D0
-0000500C                            36  ;    NOP
-0000500C                            37  ;    LEA DONE,A1
-0000500C                            38  ;    JSR DONE
-0000500C                            39  ;    SIMHALT             ; halt simulator
-0000500C                            40  
-0000500C                            41  
-0000500C                            42  ;DONE MOVE.B #$F,D0
-0000500C                            43  ;     RTS           
-0000500C                            44  * Put variables and constants here
-0000500C                            45  
-0000500C                            46      END    START        ; last line of source
+00005000  283C 00201010             10     MOVE.L   #$00201010,D4
+00005006  DA44                      11     ADD.W    D4,D5
+00005008  DDC5                      12     ADDA.L   D5,A6
+0000500A  DBB9 00009000             13     ADD.L    D5,$9000
+00005010  DAB9 00009000             14     ADD.L    $9000,D5
+00005016  C23C 0012                 15     AND.B    #$12,D1
+0000501A  E2BD                      16     ROR.L    D1,D5
+0000501C  E69D                      17     ROR.L    #$3,D5
+0000501E  E27D                      18     ROR.W    D1,D5
+00005020  E65D                      19     ROR.W    #$3,D5
+00005022  E23D                      20     ROR.B    D1,D5
+00005024  E61D                      21     ROR.B    #$3,D5
+00005026  E5A3                      22     ASL.L    D2,D3
+00005028  E583                      23     ASL.L    #$2,D3
+0000502A  E563                      24     ASL.W    D2,D3
+0000502C  E543                      25     ASL.W    #$2,D3
+0000502E  E523                      26     ASL.B    D2,D3
+00005030  E503                      27     ASL.B    #$2,D3
+00005032  EDAF                      28     LSL.L    D6,D7
+00005034  EB8F                      29     LSL.L    #$5,D7
+00005036  ED6F                      30     LSL.W    D6,D7
+00005038  EB4F                      31     LSL.W    #$5,D7
+0000503A  ED2F                      32     LSL.B    D6,D7
+0000503C  EB0F                      33     LSL.B    #$5,D7
+0000503E                            34     
+0000503E  4640                      35      NOT D0
+00005040  4E71                      36      NOP
+00005042                            37   ;   LEA DONE,A1
+00005042                            38  ;    JSR DONE
+00005042                            39  ;    SIMHALT             ; halt simulator
+00005042                            40  
+00005042                            41  
+00005042                            42  ;DONE MOVE.B #$F,D0
+00005042                            43  ;     RTS           
+00005042                            44  * Put variables and constants here
+00005042                            45  
+00005042                            46      END    START        ; last line of source
 
 No errors detected
 No warnings generated
