@@ -8,7 +8,7 @@
 START:
         *JSR        WELCOME
         MOVEA.L     #$5000,A2    * for testing
-        MOVEA.L     #$500B,A3
+        MOVEA.L     #$5041,A3
         MOVEA.L     #$00000500,A5
         MOVEA.L     A2,A4      * does this need to be W depending on where in mem start is?
         JSR         BUILD_EA_TREE
@@ -108,7 +108,7 @@ BLDLOOP
         ADDA.W #8,A1           * should put us at TREE + $6C
         MOVE.L #AND,(A1)+      * node 27 is AND
         MOVE.L #ADD,(A1)+      * node 28 is ADD
-        MOVE.L #TESTBIT,(A1)+  * 29 is a decision node
+        MOVE.L #SHIFT_TEST,(A1)+  * 29 is a decision node
         MOVE.L #BAD,(A1)+      * 30 is invalid code, puts us at TREE + $7C
         
         ADDA.W #$30,A1         * go to TREE + $AC which is node 43
@@ -116,7 +116,7 @@ BLDLOOP
         MOVE.L #TESTBIT,(A1)   * 44 is decision node, should be B0
         
         ADDA.W #$3C,A1         * should put us at TREE + $EC
-        MOVE.L #SHIFT_TEST,(A1)+  * node 59 is decision
+        MOVE.L #TESTBIT,(A1)+  * node 59 is decision
         MOVE.L #BAD,(A1)       * node 60 is invalid code
         
         ADDA.W #$6C,A1         * should put us at TREE + $15C
@@ -1138,6 +1138,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 
 
