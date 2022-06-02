@@ -698,6 +698,7 @@ UNDEF
        RTS 
 *-----------------------------------------------------------      
 BAD    
+       MOVE.W   (A4),D3
        LEA      BADDATA,A1
        MOVE.B   #14,D0
        TRAP     #15
@@ -813,6 +814,10 @@ NOPETC
        ROL.W    #8,D5
        CMP.B    #$46,D5
        BEQ      NOT
+       CMP.B    #$48,D5
+       BEQ      MOVEMSTUFF
+       CMP.B    #$4C,D5
+       BEQ      MOVEMSTUFF
        
        MOVE.W   D3,D5
        BTST     #$8,D3
@@ -833,6 +838,51 @@ NOPETC
        BEQ      NOP
        BRA      BAD
        RTS
+       
+MOVEMSTUFF
+       CLR.L    D5
+       MOVE.W   D3,D5
+       ROR.W    #3,D5
+       ANDI.W   #7,D5
+       CMP.B    #7,D5
+       BNE      NOTIMM
+       MOVE.W   D3,D5
+       ANDI.W   #7,D5
+       CMP.B    #0,D5
+       BEQ      ABS_SHORT
+       CMP.B    #1,D5
+       BEQ      ABS_LONG
+       
+       JSR      MOVEMSKIP
+       JSR      BAD
+       RTS
+
+ABS_SHORT
+       JSR      MOVEMSKIP
+       JSR      MOVEMSKIP
+       JSR      BAD
+       RTS
+       
+ABS_LONG
+       JSR      MOVEMSKIP
+       JSR      MOVEMSKIP
+       JSR      MOVEMSKIP
+       JSR      BAD
+       RTS
+       
+NOTIMM JSR      MOVEMSKIP
+       JSR      BAD
+       RTS
+       
+MOVEMSKIP JSR BAD
+          LEA         NXT_LINE,A1
+          MOVE        #13,D0
+          TRAP        #15
+          CLR.L       D4
+          MOVE.W      A4,D4
+          JSR         PRINTHEX
+          RTS
+          
 *-----------------------------------------------------------       
 NOT    
        LEA      NT,A1        
@@ -1304,6 +1354,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 
 
