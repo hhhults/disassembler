@@ -1002,18 +1002,49 @@ PRINT_DISPLACEMENT
       BEQ LONGDISP
       CLR.L D4
       MOVE.B D3,D4
+      
+      LEA P_PERIOD,A1
+      MOVE.B #14,D0
+      TRAP #15
+      LEA P_B,A1
+      MOVE.B #14,D0
+      TRAP #15
+      LEA P_SPACE,A1
+      MOVE.B #14,D0
+      TRAP #15
+      
       EXT.W D4
       ADDA.L #2,A4
       ADD.W A4,D4
       JSR PRINTHEX
       RTS
 WORDDISP
+     LEA P_PERIOD,A1
+     MOVE.B #14,D0
+     TRAP #15
+     LEA P_W,A1
+     MOVE.B #14,D0
+     TRAP #15
+     LEA P_SPACE,A1
+     MOVE.B #14,D0
+     TRAP #15
+      
      ADDA.L #2,A4
      MOVE.L A4,D4
      ADD.W (A4)+,D4
      JSR PRINTHEX
      RTS
 LONGDISP
+     LEA P_PERIOD,A1
+     MOVE.B #14,D0
+     TRAP #15
+     LEA P_W,A1
+     MOVE.B #14,D0
+     TRAP #15
+     LEA P_SPACE,A1
+     MOVE.B #14,D0
+     TRAP #15
+     
      ADDA.L #2,A4
      MOVE.L A4,D4
      ADD.L (A4)+,D4
@@ -1233,10 +1264,10 @@ NT          DC.B    ' NOT',0
 AQ          DC.B    ' ADDQ ',0
 AN          DC.B    ' AND',0
 AD          DC.B    ' ADD',0
-BR          DC.B    ' BRA ',0
-BE          DC.B    ' BEQ ',0
-BG          DC.B    ' BGT ',0
-BL          DC.B    ' BLE ',0
+BR          DC.B    ' BRA',0
+BE          DC.B    ' BEQ',0
+BG          DC.B    ' BGT',0
+BL          DC.B    ' BLE',0
 AR          DC.B    ' ASR',0
 AL          DC.B    ' ASL',0
 LA          DC.B    ' LEA ',0
@@ -1271,6 +1302,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 
 
