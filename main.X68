@@ -918,10 +918,24 @@ NOT
        LEA      NT,A1        
        MOVE.B   #14,D0
        TRAP     #15
+       CLR.L    D5
+       MOVE.W   D3,D5
+       ANDI.W   #$003F,D5
+       CMP      #$3C,D5
+       BEQ      BAD_NOT_MODE
+       LSR.W    #$03,D5
+       CMP      #$01,D5
+       BEQ      BAD_NOT_MODE
        JSR      LOGIC_SIZE_CHK
        MOVE.L   #6,D6
        JSR      CHK_EA_SOURCE
-       RTS     
+       RTS
+BAD_NOT_MODE     
+       LEA     INVALIDMODE,A1
+       MOVE.B  #14,D0
+       TRAP    #15
+       ADDA.L  #$02,A4
+       RTS
 *----------------------------------------------------------- 
 OR
        CLR.L    D5
@@ -929,15 +943,37 @@ OR
        ANDI     #$00C0,D5
        LSR.W    #$6,D5
        CMP      #3,D5
-       BEQ      BAD
+       BEQ      BAD       
        CLR.L    D5
        LEA      OAR,A1
        MOVE.B   #14,D0
        TRAP     #15
        JSR      LOGIC_SIZE_CHK 
+       BTST     #$08,D5
+       BNE      BAD_SUB_MODE                     
+OR_BACK 
+       CLR.L    D5
+       MOVE.W   D3,D5
+       ANDI.W   #$0038,D5
+       LSR.W    #$03,D5
+       CMP      #$01,D5
+       BEQ      P_BAD_OR_MODE
        MOVE.L   #6,D6  
        JSR      LOGIC_PARAMETER_CHK 
        RTS
+BAD_OR_MODE
+       MOVE.W   D3,D5
+       ANDI.W   #$003F,D5
+       CMP      #$3C,D5
+       BEQ      P_BAD_OR_MODE
+       BRA      SUB_BACK 
+P_BAD_OR_MODE
+       LEA     INVALIDMODE,A1
+       MOVE.B  #14,D0
+       TRAP    #15
+       ADDA.L  #$02,A4
+       RTS
+
 *-----------------------------------------------------------
 LEA    
        LEA      LA,A1
@@ -1384,6 +1420,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 
 
