@@ -57,7 +57,7 @@ DONE                * end program
         TRAP        #15
 
         LEA DONEMSG,A1
-        MOVE.B #14,D0
+        MOVE.B #13,D0
         TRAP #15
         
 CTMSG   LEA CONTINUEMSG,A1
