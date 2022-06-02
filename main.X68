@@ -400,6 +400,7 @@ LOGIC_A     ;IF THE INSTRUCTION IS ADDA, PRINTS THE A
             LEA     P_A,A1
             MOVE.B  #14,D0
             TRAP    #15
+            CLR.L   D6
             MOVE.L  #$08,D6                        
             BTST    #$8,D5
             BNE     LOGIC_WORD
