@@ -1,6 +1,6 @@
 00005000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 6/1/2022 7:10:09 PM
+Created On: 6/1/2022 10:42:47 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :test file
@@ -9,45 +9,129 @@ Created On: 6/1/2022 7:10:09 PM
 00000000                             5  * Description:has a couple instructions to load into memory for the disassembler
 00000000                             6  *-----------------------------------------------------------
 00005000                             7      ORG    $5000
-00005000                             8  START:                  ; first instruction of program
+00005000                             8  START:                  ; NEED Bcc TESTS *************************************** <--- *|||||
 00005000                             9  
-00005000  283C 00201010             10     MOVE.L   #$00201010,D4
-00005006  DA44                      11     ADD.W    D4,D5
-00005008  DDC5                      12     ADDA.L   D5,A6
-0000500A  DBB9 00009000             13     ADD.L    D5,$9000
-00005010  DAB9 00009000             14     ADD.L    $9000,D5
-00005016  C23C 0012                 15     AND.B    #$12,D1
-0000501A  E2BD                      16     ROR.L    D1,D5
-0000501C  E69D                      17     ROR.L    #$3,D5
-0000501E  E27D                      18     ROR.W    D1,D5
-00005020  E65D                      19     ROR.W    #$3,D5
-00005022  E23D                      20     ROR.B    D1,D5
-00005024  E61D                      21     ROR.B    #$3,D5
-00005026  E5A3                      22     ASL.L    D2,D3
-00005028  E583                      23     ASL.L    #$2,D3
-0000502A  E563                      24     ASL.W    D2,D3
-0000502C  E543                      25     ASL.W    #$2,D3
-0000502E  E523                      26     ASL.B    D2,D3
-00005030  E503                      27     ASL.B    #$2,D3
-00005032  EDAF                      28     LSL.L    D6,D7
-00005034  EB8F                      29     LSL.L    #$5,D7
-00005036  ED6F                      30     LSL.W    D6,D7
-00005038  EB4F                      31     LSL.W    #$5,D7
-0000503A  ED2F                      32     LSL.B    D6,D7
-0000503C  EB0F                      33     LSL.B    #$5,D7
-0000503E                            34     
-0000503E  4640                      35      NOT D0
-00005040  4E71                      36      NOP
-00005042                            37   ;   LEA DONE,A1
-00005042                            38  ;    JSR DONE
-00005042                            39  ;    SIMHALT             ; halt simulator
-00005042                            40  
-00005042                            41  
-00005042                            42  ;DONE MOVE.B #$F,D0
-00005042                            43  ;     RTS           
-00005042                            44  * Put variables and constants here
-00005042                            45  
-00005042                            46      END    START        ; last line of source
+00005000  4E71                      10     NOP
+00005002  6000 014A                 11     BRA  TEST_BRA
+00005006                            12     
+00005006                            13  TEST_BACK
+00005006  287C 00005000             14      MOVEA.L  #$00005000,A4
+0000500C  247C 00009000             15      MOVEA.L  #$00009000,A2
+00005012                            16      ;MOVE INSTRUCTION TESTS
+00005012  283C 00201010             17     MOVE.L   #$00201010,D4
+00005018  2A04                      18     MOVE.L   D4,D5
+0000501A  323C 0005                 19     MOVE.W   #$0005,D1
+0000501E  3401                      20     MOVE.W   D1,D2
+00005020  183C 0005                 21     MOVE.B   #$05,D4
+00005024  1801                      22     MOVE.B   D1,D4
+00005026  287C 00005000             23     MOVEA.L  #$00005000,A4
+0000502C  2814                      24     MOVE.L   (A4),D4
+0000502E  2824                      25     MOVE.L   -(A4),D4
+00005030  281C                      26     MOVE.L   (A4)+,D4
+00005032  2838 5000                 27     MOVE.L   $00005000,D4
+00005036  3814                      28     MOVE.W   (A4),D4
+00005038  3824                      29     MOVE.W   -(A4),D4
+0000503A  381C                      30     MOVE.W   (A4)+,D4
+0000503C  3838 5000                 31     MOVE.W   $5000,D4
+00005040  280C                      32     MOVE.L   A4,D4
+00005042  24BC A5A5A5A5             33     MOVE.L   #$A5A5A5A5,(A2)
+00005048  24FC A5A5A5A5             34     MOVE.L   #$A5A5A5A5,(A2)+
+0000504E  253C A5A5A5A5             35     MOVE.L   #$A5A5A5A5,-(A2)
+00005054  34BC A5A5                 36     MOVE.W   #$A5A5,(A2)
+00005058  353C A5A5                 37     MOVE.W   #$A5A5,-(A2)
+0000505C  34FC A5A5                 38     MOVE.W   #$A5A5,(A2)+
+00005060                            39     ;MOVEA INSTRUCTION TESTS
+00005060  287C 00005000             40      MOVEA.L  #$00005000,A4
+00005066  2844                      41      MOVEA.L  D4,A4 
+00005068  2A54                      42      MOVEA.L  (A4),A5
+0000506A  2A64                      43      MOVEA.L  -(A4),A5
+0000506C  2A5C                      44      MOVEA.L  (A4)+,A5
+0000506E  3C44                      45      MOVEA.W  D4,A6
+00005070  3C7C 5000                 46      MOVEA.W  #$5000,A6
+00005074  3A54                      47      MOVEA.W  (A4),A5
+00005076  3A64                      48      MOVEA.W  -(A4),A5
+00005078  3A5C                      49      MOVEA.W  (A4)+,A5 
+0000507A                            50      ;MOVEQ INSTRUCTION TESTS
+0000507A  7807                      51      MOVEQ   #$07,D4
+0000507C  7801                      52      MOVEQ   #$01,D4
+0000507E                            53      ;NOT INSTRUCTION TESTS
+0000507E  4601                      54      NOT.B   D1
+00005080  4614                      55      NOT.B   (A4)
+00005082  461C                      56      NOT.B   (A4)+
+00005084  4624                      57      NOT.B   -(A4)
+00005086  4639 00009000             58      NOT.B   $00009000
+0000508C  4641                      59      NOT.W   D1
+0000508E  4654                      60      NOT.W   (A4)
+00005090  465C                      61      NOT.W   (A4)+
+00005092  4664                      62      NOT.W  -(A4)
+00005094  4679 00009000             63      NOT.W  $00009000
+0000509A  4681                      64      NOT.L  D1
+0000509C  4694                      65      NOT.L  (A4)
+0000509E  469C                      66      NOT.L  (A4)+
+000050A0  46A4                      67      NOT.L  -(A4)
+000050A2  46B9 00009000             68      NOT.L  $00009000
+000050A8                            69      ;OR INSTRUCTION TESTS
+000050A8  8339 00009000             70      OR.B    D1,$9000
+000050AE  8239 00009000             71      OR.B    $00009000,D1
+000050B4  8339 00009000             72      OR.B    D1,$00009000
+000050BA  8239 00009000             73      OR.B    $9000,D1
+000050C0  8314                      74      OR.B    D1,(A4)
+000050C2  8324                      75      OR.B    D1,-(A4)
+000050C4  831C                      76      OR.B    D1,(A4)+
+000050C6  8379 00009000             77      OR.W    D1,$9000
+000050CC  8279 00009000             78      OR.W    $00009000,D1
+000050D2  8379 00009000             79      OR.W    D1,$00009000
+000050D8  8279 00009000             80      OR.W    $9000,D1
+000050DE  8354                      81      OR.W    D1,(A4)
+000050E0  8364                      82      OR.W    D1,-(A4)
+000050E2  835C                      83      OR.W    D1,(A4)+
+000050E4  83B9 00009000             84      OR.L    D1,$9000
+000050EA  82B9 00009000             85      OR.L    $00009000,D1
+000050F0  83B9 00009000             86      OR.L    D1,$00009000
+000050F6  82B9 00009000             87      OR.L    $9000,D1
+000050FC  8394                      88      OR.L    D1,(A4)
+000050FE  83A4                      89      OR.L    D1,-(A4)
+00005100  839C                      90      OR.L    D1,(A4)+
+00005102                            91      ;SUB INSTRUCTION TESTS 
+00005102                            92      
+00005102  DA44                      93     ADD.W    D4,D5
+00005104  DBB9 00009000             94     ADD.L    D5,$9000
+0000510A  DAB9 00009000             95     ADD.L    $9000,D5
+00005110  DDC5                      96     ADDA.L   D5,A6
+00005112  C23C 0012                 97     AND.B    #$12,D1
+00005116  E2BD                      98     ROR.L    D1,D5
+00005118  E69D                      99     ROR.L    #$3,D5
+0000511A  E27D                     100     ROR.W    D1,D5
+0000511C  E65D                     101     ROR.W    #$3,D5
+0000511E  E23D                     102     ROR.B    D1,D5
+00005120  E61D                     103     ROR.B    #$3,D5
+00005122  E5A3                     104     ASL.L    D2,D3
+00005124  E583                     105     ASL.L    #$2,D3
+00005126  E563                     106     ASL.W    D2,D3
+00005128  E543                     107     ASL.W    #$2,D3
+0000512A  E523                     108     ASL.B    D2,D3
+0000512C  E503                     109     ASL.B    #$2,D3
+0000512E  EDAF                     110     LSL.L    D6,D7
+00005130  EB8F                     111     LSL.L    #$5,D7
+00005132  ED6F                     112     LSL.W    D6,D7
+00005134  EB4F                     113     LSL.W    #$5,D7
+00005136  ED2F                     114     LSL.B    D6,D7
+00005138  EB0F                     115     LSL.B    #$5,D7
+0000513A                           116     
+0000513A  4640                     117      NOT D0
+0000513C  4E71                     118      NOP
+0000513E  43F9 00005152            119      LEA DONE,A1
+00005144  4EB9 00005152            120      JSR DONE
+0000514A  FFFF FFFF                121      SIMHALT             ; halt simulator
+0000514E                           122  
+0000514E                           123  TEST_BRA
+0000514E                           124      
+0000514E  6000 FEB6                125      BRA TEST_BACK
+00005152  103C 000F                126  DONE MOVE.B #$F,D0
+00005156  4E75                     127       RTS           
+00005158                           128  * Put variables and constants here
+00005158                           129  
+00005158                           130      END    START        ; last line of source
 
 No errors detected
 No warnings generated
@@ -56,4 +140,7 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
+DONE                5152
 START               5000
+TEST_BACK           5006
+TEST_BRA            514E

@@ -8,7 +8,7 @@
 START:
         *JSR        WELCOME
         MOVEA.L     #$5000,A2    * for testing
-        MOVEA.L     #$5100,A3
+        MOVEA.L     #$5157,A3
         MOVEA.L     #$00000500,A5
         MOVEA.L     A2,A4      * does this need to be W depending on where in mem start is?
         JSR         BUILD_EA_TREE
@@ -670,11 +670,22 @@ MOVEQ
        ADDI.W   #$00FF,D1
        MOVE.B   #3,D0
        TRAP     #15
+       
+       CLR.L    D1
+       MOVE.W   D3,D1
+       ANDI.W   #$0E00,D1
+       ROL.W    #$07,D1
       
        LEA      P_COMMA,A1
        MOVE     #14,D0
        TRAP     #15         
-       JSR      CHK_EA_DEST
+       
+       JSR      M_DR
+       
+       CLR.L   D5
+       MOVE.L  A4,D5
+       ADDQ    #$2,D5
+       MOVEA.L D5,A4
        
        RTS
 *-----------------------------------------------------------       
@@ -1152,6 +1163,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 
 
