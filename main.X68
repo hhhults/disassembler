@@ -225,9 +225,15 @@ CHK_EA_SOURCE
             ANDI.W  #$0038,D5
             LSR.W   #$3,D5
             
-            CMP.B   #$7,D5
-            BEQ     IS_ABS_IMM            
+            CMP.B   #$5,D5
+            BEQ     BAD_SOURCE_MODE
+            CMP.B   #$6,D5
+            BEQ     BAD_SOURCE_MODE
             
+            CMP.B   #$7,D5
+            BEQ     IS_ABS_IMM  
+            BGT     BAD_SOURCE_MODE
+             
             MULU.W  #$4,D5
             ADD.L   EA_TREE,D5
             MOVEA.L D5,A5
@@ -242,6 +248,12 @@ CHK_EA_SOURCE
             CLR.L   D5
 
             RTS
+            
+BAD_SOURCE_MODE
+            LEA     INVALIDMODE,A1
+            MOVE.B  #14,D0
+            TRAP    #15
+            RTS
 *-----------------------------------------------------------
 ;COMPARES A DESTINATION MODE FROM THE OPCODE TO THE EA TREE FOR MOVE INSTRUCTIONS
 CHK_EA_DEST       
@@ -252,8 +264,14 @@ CHK_EA_DEST
             
             MOVE.L  #9,D6
             
+            CMP.B   #$5,D5
+            BEQ     BAD_DEST_MODE
+            CMP.B   #$6,D5
+            BEQ     BAD_DEST_MODE
+            
             CMP.B   #$7,D5
-            BEQ     IS_ABS_IMM            
+            BEQ     IS_ABS_IMM 
+            BGT     BAD_SOURCE_MODE           
             
             MULU.W  #$4,D5
             ADD.L   EA_TREE,D5
@@ -267,7 +285,12 @@ CHK_EA_DEST
             MOVEA.L (A5),A6
             JSR     (A6)
             
-            RTS      
+            RTS 
+BAD_DEST_MODE
+            LEA     INVALIDMODE,A1
+            MOVE.B  #14,D0
+            TRAP    #15
+            RTS     
 *-----------------------------------------------------------
 ;COMPARES REGISTER NUMBER FOR ABSOLUTES AND IMMEDIATES FOR PRINTING
 IS_ABS_IMM      
@@ -278,9 +301,15 @@ IS_ABS_IMM
             BRA     IS_SOURCE                        
 IS_DEST    
             ANDI.W  #$0E00,D5
-            ROL.W   #$07,D5
-            BRA     IS_SOURCE             
+            ROL.W   #$07,D5             
 IS_SOURCE
+            CMP     #$2,D5
+            BEQ     BAD_ABS_IMM_MODE
+            CMP     #$3,D5
+            BEQ     BAD_ABS_IMM_MODE
+            CMP     #$5,D5
+            BGE     BAD_ABS_IMM_MODE
+            
             ADDQ    #$4,D5
             MULU.W  #$04,D5
             ADDQ    #$4,D5
@@ -290,6 +319,9 @@ IS_SOURCE
             MOVEA.L (A5),A6
             JSR     (A6)
             
+            RTS
+BAD_ABS_IMM_MODE
+
             RTS
 *-----------------------------------------------------------            
 LOGIC_PARAMETER_CHK
@@ -376,6 +408,7 @@ LOGIC_DONE
             TRAP    #15
              
             RTS   
+         
 *-----------------------------------------------------------  
 SHIFT_REG_PARAMETER_CHK  
             ;ROTATION VALUE CHECK
