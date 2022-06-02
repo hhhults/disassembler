@@ -91,9 +91,13 @@ WELCOME
         BLT INVALIDBOUNDS
         CMP.L #0,D3
         BLT INVALIDBOUNDS
+        CMP.L #$00FFFFFF,D3
+        BGE   INVALIDBOUNDS
         MOVE.L BEGIN,D3
         CMP.L #0,D3
         BLT INVALIDBOUNDS
+        CMP.L #$00FFFFFF,D3
+        BGE INVALIDBOUNDS
         RTS
     
 INVALIDBOUNDS LEA BOUNDSMSG,A1
@@ -943,7 +947,8 @@ OR
        ANDI     #$00C0,D5
        LSR.W    #$6,D5
        CMP      #3,D5
-       BEQ      BAD       
+       BEQ      ORSTUFF
+     
        CLR.L    D5
        LEA      OAR,A1
        MOVE.B   #14,D0
@@ -961,6 +966,7 @@ OR_BACK
        MOVE.L   #6,D6  
        JSR      LOGIC_PARAMETER_CHK 
        RTS
+
 BAD_OR_MODE
        MOVE.W   D3,D5
        ANDI.W   #$003F,D5
@@ -973,7 +979,48 @@ P_BAD_OR_MODE
        TRAP    #15
        ADDA.L  #$02,A4
        RTS
+       
+ORSTUFF
+       CLR.L    D5
+       MOVE.W   D3,D5
+       ROR.W    #3,D5
+       ANDI.W   #7,D5
+       CMP.B    #7,D5
+       BNE      NOTIMM2
+       MOVE.W   D3,D5
+       ANDI.W   #7,D5
+       CMP.B    #0,D5
+       BEQ      ABS_SHORT2
+       CMP.B    #1,D5
+       BEQ      ABS_LONG2
+       
+       JSR      ORSKIP
+       JSR      BAD
+       RTS
 
+ABS_SHORT2
+       JSR      ORSKIP
+       JSR      BAD
+       RTS
+       
+ABS_LONG2
+       JSR      ORSKIP
+       JSR      ORSKIP
+       JSR      BAD
+       RTS
+       
+NOTIMM2
+       JSR      BAD
+       RTS
+       
+ORSKIP JSR BAD
+          LEA         NXT_LINE,A1
+          MOVE        #13,D0
+          TRAP        #15
+          CLR.L       D4
+          MOVE.W      A4,D4
+          JSR         PRINTHEX
+          RTS
 *-----------------------------------------------------------
 LEA    
        LEA      LA,A1
@@ -1053,7 +1100,7 @@ AND
        ANDI     #$00C0,D5
        LSR.W    #$6,D5
        CMP      #3,D5
-       BEQ      BAD
+       BEQ      ORSTUFF
        CLR.L    D5  
        LEA      AN,A1
        MOVE.B   #14,D0
@@ -1420,6 +1467,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 
 
