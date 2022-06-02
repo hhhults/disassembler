@@ -1013,14 +1013,15 @@ NOTIMM2
        JSR      BAD
        RTS
        
-ORSKIP JSR BAD
-          LEA         NXT_LINE,A1
-          MOVE        #13,D0
-          TRAP        #15
-          CLR.L       D4
-          MOVE.W      A4,D4
-          JSR         PRINTHEX
-          RTS
+ORSKIP 
+       JSR      BAD
+       LEA      NXT_LINE,A1
+       MOVE     #13,D0
+       TRAP     #15
+       CLR.L    D4
+       MOVE.W   A4,D4
+       JSR      PRINTHEX
+       RTS
 *-----------------------------------------------------------
 LEA    
        LEA      LA,A1
@@ -1467,6 +1468,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 
 
