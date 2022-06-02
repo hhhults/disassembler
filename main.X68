@@ -16,8 +16,8 @@ START:
 LOOP
         CLR.B       D2
         JSR         BLOCK_OUT
-        MOVE.B      #14,D0
         
+        MOVE.B      #14,D0
         LEA         IOMSG,A1
         TRAP        #15
         
@@ -1057,11 +1057,17 @@ LOOP1
        
 HEXVAL 
        CMPI.B   #$39,D2     * convert ascii char value to hex
-       BGT.B    LETTER
+       BGT      LETTER
+       CMPI.B   #$2F,D2
+       BLE      BADHEX
        SUBI.B   #$30,D2
        BRA      WRITE
     
 LETTER 
+       CMPI.B   #$40,D2
+       BLE      BADHEX
+       CMPI.B   #$46,D2
+       BGT      BADHEX
        SUBI.B   #$37,D2
        BRA      WRITE
     
@@ -1070,6 +1076,11 @@ WRITE                     * write hex val to D3
        CMPI.B   #0,D1
        BNE      LOOP1
        RTS
+       
+BADHEX LEA      BADHEXMSG,A1
+       MOVE.B   #14,D0
+       TRAP     #15
+       BRA GETINPUT
 *-----------------------------------------------------------
 PRINTHEX 
          MOVE.B #1,D5
@@ -1149,6 +1160,7 @@ DONEMSG     DC.B    'You have reached the end of the disassembler.',0
 IOMSG       DC.B    'Press enter to see the next screen of data.',CR,LF,0
 INVALIDMODE DC.B    ' Mode is not currently supported.',0
 BOUNDSMSG   DC.B    'The program bounds you entered are not valid.',CR,LF,0
+BADHEXMSG   DC.B    'Looks like that is not valid hex. Try entering it again: ',0
 BADDATA     DC.B    ' Data ',0
 MQ          DC.B    ' MOVEQ ',0
 MB          DC.B    ' MOVE.B ',0
