@@ -668,11 +668,15 @@ MOVEQ
        MOVE.B   #14,D0
        TRAP     #15
        
-       CLR.L    D1
-       MOVE.W   D3,D1
-       ADDI.W   #$00FF,D1
-       MOVE.B   #3,D0
+       CLR.L    D4
+       MOVE.W   D3,D4
+       ANDI.W   #$00FF,D4
+        
+       LEA      P_HEX,A1
+       MOVE.B   #14,D0    
        TRAP     #15
+
+       JSR      PRINTHEX
        
        CLR.L    D1
        MOVE.W   D3,D1
@@ -681,8 +685,8 @@ MOVEQ
       
        LEA      P_COMMA,A1
        MOVE     #14,D0
-       TRAP     #15         
-       
+       TRAP     #15    
+     
        JSR      M_DR
        
        CLR.L   D5
@@ -1128,6 +1132,7 @@ PROMPT2     DC.B    'Please enter the memory value of the end of the program: ',
 UNDEFINED   DC.B    'The program should never reach this state.',0
 DONEMSG     DC.B    'You have reached the end of the disassembler.',0
 IOMSG       DC.B    'Press enter to see the next screen of data.',0
+INVALIDMODE DC.B    ' Mode is not currently supported.',0
 BADDATA     DC.B    ' Data ',0
 MQ          DC.B    ' MOVEQ ',0
 MB          DC.B    ' MOVE.B ',0
