@@ -321,7 +321,9 @@ IS_SOURCE
             
             RTS
 BAD_ABS_IMM_MODE
-
+            LEA     INVALIDMODE,A1
+            MOVE.B  #14,D0
+            TRAP    #15
             RTS
 *-----------------------------------------------------------            
 LOGIC_PARAMETER_CHK
@@ -1302,6 +1304,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 
 
