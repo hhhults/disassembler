@@ -59,6 +59,17 @@ DONE                * end program
         LEA DONEMSG,A1
         MOVE.B #14,D0
         TRAP #15
+        
+CTMSG   LEA CONTINUEMSG,A1
+        MOVE.B #14,D0
+        TRAP #15
+        
+        JSR GETINPUT
+        CMP.B #1,D3
+        BEQ START
+        CMP.B #0,D3
+        BNE CTMSG
+        
         MOVE.B      #9,D0
         TRAP        #15
     
@@ -1158,6 +1169,7 @@ PROMPT1     DC.B    'Please enter the memory value of the start of the program: 
 PROMPT2     DC.B    'Please enter the memory value of the end of the program: ',0
 UNDEFINED   DC.B    'The program should never reach this state.',0
 DONEMSG     DC.B    'You have reached the end of the disassembler.',0
+CONTINUEMSG DC.B    'Enter "1" to disassemble another program or "0" to exit the disassembler: ',0
 IOMSG       DC.B    'Press enter to see the next screen of data.',CR,LF,0
 INVALIDMODE DC.B    ' Mode is not currently supported.',0
 BOUNDSMSG   DC.B    'The program bounds you entered are not valid.',0
