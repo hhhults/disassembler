@@ -86,7 +86,7 @@ WELCOME
         RTS
     
 INVALIDBOUNDS LEA BOUNDSMSG,A1
-              MOVE.B #14,D0
+              MOVE.B #13,D0
               TRAP #15
               BRA WELCOME    
     
@@ -1159,7 +1159,7 @@ UNDEFINED   DC.B    'The program should never reach this state.',0
 DONEMSG     DC.B    'You have reached the end of the disassembler.',0
 IOMSG       DC.B    'Press enter to see the next screen of data.',CR,LF,0
 INVALIDMODE DC.B    ' Mode is not currently supported.',0
-BOUNDSMSG   DC.B    'The program bounds you entered are not valid.',CR,LF,0
+BOUNDSMSG   DC.B    'The program bounds you entered are not valid.',0
 BADHEXMSG   DC.B    'Looks like that is not valid hex. Try entering it again: ',0
 BADDATA     DC.B    ' Data ',0
 MQ          DC.B    ' MOVEQ ',0
