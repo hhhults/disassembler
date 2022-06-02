@@ -59,13 +59,13 @@ TEST_BACK
     NOT.W   D1
     NOT.W   (A4)
     NOT.W   (A4)+
-    NOT.W  -(A4)
-    NOT.W  $00009000
-    NOT.L  D1
-    NOT.L  (A4)
-    NOT.L  (A4)+
-    NOT.L  -(A4)
-    NOT.L  $00009000
+    NOT.W   -(A4)
+    NOT.W   $00009000
+    NOT.L   D1
+    NOT.L   (A4)
+    NOT.L   (A4)+
+    NOT.L   -(A4)
+    NOT.L   $00009000
     ;OR INSTRUCTION TESTS
     OR.B    D1,$9000
     OR.B    $00009000,D1
@@ -89,10 +89,70 @@ TEST_BACK
     OR.L    D1,-(A4)
     OR.L    D1,(A4)+
     ;SUB INSTRUCTION TESTS 
-    
-   ADD.W    D4,D5
-   ADD.L    D5,$9000
-   ADD.L    $9000,D5
+    MOVE.L  #$02,D1
+    SUB.L   D1,D2
+    SUB.L   D1,(A2) 
+    SUB.L   D1,-(A2)
+    SUB.L   D1,(A2)+
+    SUB.L   #$00010002,D1
+    SUB.L   #$00010002,(A2)
+    SUB.L   #$00010002,-(A2)
+    SUB.L   #$00010002,(A2)+
+    SUB.W   D1,D2
+    SUB.W   D1,(A2) 
+    SUB.W   D1,-(A2)
+    SUB.W   D1,(A2)+
+    SUB.W   #$0002,D1
+    SUB.W   #$0002,(A2)
+    SUB.W   #$0002,-(A2)
+    SUB.W   #$0002,(A2)+
+    SUB.B   D1,D2
+    SUB.B   D1,(A2) 
+    SUB.B   D1,-(A2)
+    SUB.B   D1,(A2)+
+    SUB.B   #$02,D1
+    SUB.B   #$02,(A2)
+    SUB.B   #$02,-(A2)
+    SUB.B   #$02,(A2)+
+    SUB.L    D2,$9000
+    SUB.L    $9000,D2
+    SUB.W    D2,$9000
+    SUB.W    $9000,D2
+    SUB.B    D2,$9000
+    SUB.B    $9000,D2
+    ;ADD INSTRUCTION TESTS
+    MOVE.L  #$02,D1
+    ADD.L   D1,D2
+    ADD.L   D1,(A2) 
+    ADD.L   D1,-(A2)
+    ADD.L   D1,(A2)+
+    ADD.L   #$F0000002,D1
+    ADD.L   #$F0000002,(A2)
+    ADD.L   #$F0000002,-(A2)
+    ADD.L   #$F0000002,(A2)+
+    ADD.W   D1,D2
+    ADD.W   D1,(A2) 
+    ADD.W   D1,-(A2)
+    ADD.W   D1,(A2)+
+    ADD.W   #$F002,D1
+    ADD.W   #$F002,(A2)
+    ADD.W   #$F002,-(A2)
+    ADD.W   #$F002,(A2)+
+    ADD.B   D1,D2
+    ADD.B   D1,(A2) 
+    ADD.B   D1,-(A2)
+    ADD.B   D1,(A2)+
+    ADD.B   #$F2,D1
+    ADD.B   #$F2,(A2)
+    ADD.B   #$F2,-(A2)
+    ADD.B   #$F2,(A2)+
+    ADD.L    D5,$9000
+    ADD.L    $9000,D5
+    ADD.W    D5,$9000
+    ADD.W    $9000,D5
+    ADD.B    D5,$9000
+    ADD.B    $9000,D5
+    ;ADDA INSTRUCTION TESTS
    ADDA.L   D5,A6
    AND.B    #$12,D1
    ROR.L    D1,D5
