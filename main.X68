@@ -721,22 +721,22 @@ SUB
        RTS      
 *-----------------------------------------------------------      
 NOPETC 
-       MOVE.L   (A4),D3
-       ROL.L    #8,D3
+       MOVE.W   (A4),D3
+       ROL.W    #8,D3
        CMP.B    #$46,D3
        BEQ      NOT
        
        MOVE.W   (A4),D3
-       BTST.L   #$8,D3
+       BTST     #$8,D3
        BNE      LEA 
-       BTST.L   D2,D3 
+       BTST     D2,D3 
        BEQ      BAD
        ROR.W    #6,D3
        ANDI.W   #$03FF,D3
        CMP.W    #$013A,D3
        BEQ      JSR
        
-       MOVE.L   (A4),D3
+       MOVE.W   (A4),D3
        ROR.W    #2,D3
        ANDI     #$3FFF,D3
        CMP.W    #$139D,D3
@@ -790,6 +790,10 @@ NOP
        LEA      NP,A1       
        MOVE.B   #14,D0
        TRAP     #15
+       CLR.L    D5
+       MOVE.L   A4,D5
+       ADDQ     #$2,D5
+       MOVEA.L  D5,A4
        RTS   
 *-----------------------------------------------------------       
 ADDQ   
