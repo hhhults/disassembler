@@ -6,11 +6,11 @@
 *-----------------------------------------------------------
     ORG    $1000
 START:
-        *JSR        WELCOME
-        MOVEA.L     #$5000,A2    * for testing
-        MOVEA.L     #$527D,A3
+        JSR        WELCOME
+        ;MOVEA.L     #$5000,A2    * for testing
+        ;MOVEA.L     #$527D,A3
         MOVEA.L     #$00000500,A5
-        MOVEA.L     A2,A4      * does this need to be W depending on where in mem start is?
+        MOVEA.L     BEGIN,A4      * does this need to be W depending on where in mem start is?
         JSR         BUILD_EA_TREE
         JSR         BUILDTREE
 LOOP
@@ -32,6 +32,7 @@ NEXTLINE
         MOVE.W      A4,D4
         JSR         PRINTHEX 
         JSR         DECODE_OP
+        MOVEA.L     END,A3
         CMP.L       A4,A3
         BLE         DONE
         LEA         NXT_LINE,A1
@@ -44,7 +45,7 @@ BLOCK_OUT
         JSR         NEXTLINE
         MOVE.B      (SP)+,D2    
         CMPA.L      END,A4
-        BLE         DONE
+        BGT         DONE
         ADDQ        #1,D2
         CMP.B       #$1F,D2
         BNE         BLOCK_OUT
@@ -62,20 +63,32 @@ DONE                * end program
         TRAP        #15
     
 WELCOME
-        LEA         PROMPT1,A1  * get start memory value, put in A2
+        LEA         PROMPT1,A1  * get start memory value, put in BEGIN
         MOVE.B      #14,D0
         TRAP        #15
     
         JSR         GETINPUT
         MOVE.L      D3,BEGIN
     
-        LEA         PROMPT2,A1  * get end memory value, put in D3
+        LEA         PROMPT2,A1  * get end memory value, put in END
         MOVE.B      #14,D0
         TRAP        #15
     
         JSR         GETINPUT
         MOVE.L      D3,END
+        CMP.L BEGIN,D3
+        BLT INVALIDBOUNDS
+        CMP.L #0,D3
+        BLT INVALIDBOUNDS
+        MOVE.L BEGIN,D3
+        CMP.L #0,D3
+        BLT INVALIDBOUNDS
         RTS
+    
+INVALIDBOUNDS LEA BOUNDSMSG,A1
+              MOVE.B #14,D0
+              TRAP #15
+              BRA WELCOME    
     
 BUILDTREE
         MOVE.W      #0,D0
@@ -822,6 +835,7 @@ RTS
        LEA      RT,A1       
        MOVE.B   #14,D0
        TRAP     #15
+       ADDA.L #2,A4
        RTS
 *-----------------------------------------------------------
 NOP    
@@ -1030,7 +1044,8 @@ NOT_ZERO  * if bit D2 of (A4) is one (go right on tree)
        RTS   
 * ----------------------------------------------------------
 * GETINPUT: gets hex value in ascii from user, puts it in D3   
-GETINPUT 
+GETINPUT
+       CLR.L D3
        MOVE.B   #2,D0     * get user string
        TRAP     #15      
 
@@ -1121,8 +1136,8 @@ IF_F
 * var storage
 TREE        DC.L    $7000  
 EA_TREE     DC.L    $0500
-BEGIN       DS.L    $5000
-END         DS.L    $6000  
+BEGIN       DS.L    $2000
+END         DS.L    $3000  
 * string storage
 CR          EQU     $0D
 LF          EQU     $09
@@ -1131,8 +1146,9 @@ PROMPT1     DC.B    'Please enter the memory value of the start of the program: 
 PROMPT2     DC.B    'Please enter the memory value of the end of the program: ',0
 UNDEFINED   DC.B    'The program should never reach this state.',0
 DONEMSG     DC.B    'You have reached the end of the disassembler.',0
-IOMSG       DC.B    'Press enter to see the next screen of data.',0
+IOMSG       DC.B    'Press enter to see the next screen of data.',CR,LF,0
 INVALIDMODE DC.B    ' Mode is not currently supported.',0
+BOUNDSMSG   DC.B    'The program bounds you entered are not valid.',CR,LF,0
 BADDATA     DC.B    ' Data ',0
 MQ          DC.B    ' MOVEQ ',0
 MB          DC.B    ' MOVE.B ',0
@@ -1183,6 +1199,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 
 
