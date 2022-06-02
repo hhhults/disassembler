@@ -671,7 +671,7 @@ BAD
        TRAP     #15
        MOVE.L   D3,D4
        JSR      PRINTHEX
-       ADD.L    #$4,A4
+       ADDA.L   #$2,A4
        RTS
 *-----------------------------------------------------------      
 MOVEB  
@@ -809,6 +809,13 @@ NOT
        RTS     
 *----------------------------------------------------------- 
 OR
+       CLR.L    D5
+       MOVE.W   D3,D5
+       ANDI     #$00C0,D5
+       LSR.W    #$6,D5
+       CMP      #3,D5
+       BEQ      BAD
+       CLR.L    D5
        LEA      OAR,A1
        MOVE.B   #14,D0
        TRAP     #15
@@ -889,7 +896,14 @@ ADDQ
        
        RTS
 *-----------------------------------------------------------
-AND    
+AND  
+       CLR.L    D5
+       MOVE.W   D3,D5
+       ANDI     #$00C0,D5
+       LSR.W    #$6,D5
+       CMP      #3,D5
+       BEQ      BAD
+       CLR.L    D5  
        LEA      AN,A1
        MOVE.B   #14,D0
        TRAP     #15       
@@ -1224,6 +1238,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 
 
