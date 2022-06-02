@@ -111,7 +111,7 @@ BLDLOOP
         MOVE.L #ADDQ,(A1)+     * ADDQ goes at 20
         MOVE.L #TESTBIT,(A1)+  * 21 is a decision node
         MOVE.L #MOVEQ,(A1)+    * MOVEQ goes at 22
-        MOVE.L #BAD,(A1)+      * 23 is invalid code
+        MOVE.L #OR,(A1)+      * OR GOES AT 23
         MOVE.L #SUB,(A1)+      * 24 is SUB
         
         ADDA.W #8,A1           * should put us at TREE + $6C
@@ -373,7 +373,7 @@ SHIFT_REG_PARAMETER_CHK
             BEQ     SHIFT_ROD
 SHIFT_ASD
             BTST    #$8,D3
-            BEQ     ASD_LEFT
+            BNE     ASD_LEFT
             LEA     AR,A1
             MOVE    #14,D0
             TRAP    #15
@@ -385,7 +385,7 @@ ASD_LEFT
             BRA     SHIFT_SIZE            
 SHIFT_LSD
             BTST    #$8,D3
-            BEQ     LSD_LEFT
+            BNE     LSD_LEFT
             LEA     LR,A1
             MOVE    #14,D0
             TRAP    #15
@@ -397,7 +397,7 @@ LSD_LEFT
             BRA     SHIFT_SIZE
 SHIFT_ROD
             BTST    #$8,D3
-            BEQ     ROD_LEFT
+            BNE     ROD_LEFT
             LEA     RR,A1
             MOVE    #14,D0
             TRAP    #15
@@ -512,6 +512,9 @@ M_DIR_A ;IF MODE IS A DIRECT ADDRESS (An)
             
             LEA     P_A,A1
             MOVE.B  #14,D0    
+            TRAP    #15
+            
+            MOVE.B  #3,D0
             TRAP    #15
             
             LEA     P_CLOSE_PAR,A1
@@ -742,26 +745,28 @@ SUB
 *-----------------------------------------------------------      
 NOPETC 
        MOVE.W   (A4),D3
-       ROL.W    #8,D3
-       CMP.B    #$46,D3
+       CLR.L    D5
+       MOVE.W   D3,D5
+       ROL.W    #8,D5
+       CMP.B    #$46,D5
        BEQ      NOT
        
-       MOVE.W   (A4),D3
+       MOVE.W   D3,D5
        BTST     #$8,D3
        BNE      LEA 
        BTST     D2,D3 
        BEQ      BAD
-       ROR.W    #6,D3
-       ANDI.W   #$03FF,D3
-       CMP.W    #$013A,D3
+       ROR.W    #6,D5
+       ANDI.W   #$03FF,D5
+       CMP.W    #$013A,D5
        BEQ      JSR
        
-       MOVE.W   (A4),D3
-       ROR.W    #2,D3
-       ANDI     #$3FFF,D3
-       CMP.W    #$139D,D3
+       MOVE.W   D3,D5
+       ROR.W    #2,D5
+       ANDI     #$3FFF,D5
+       CMP.W    #$139D,D5
        BEQ      RTS
-       CMP.W    #$139C,D3
+       CMP.W    #$139C,D5
        BEQ      NOP
        BRA      BAD
        RTS
@@ -774,6 +779,15 @@ NOT
        MOVE.L   #6,D6
        JSR      CHK_EA_SOURCE
        RTS     
+*----------------------------------------------------------- 
+OR
+       LEA      OAR,A1
+       MOVE.B   #14,D0
+       TRAP     #15
+       JSR      LOGIC_SIZE_CHK 
+       MOVE.L   #6,D6  
+       JSR      LOGIC_PARAMETER_CHK 
+       RTS
 *-----------------------------------------------------------
 LEA    
        LEA      LA,A1
@@ -1140,6 +1154,7 @@ RL          DC.B    ' ROL',0
 SB          DC.B    ' SUB',0
 JS          DC.B    ' JSR ',0
 RT          DC.B    ' RTS',0
+OAR         DC.B    ' OR',0
 
 ;necessary symbols for displaying EA's
 P_A         DC.B    'A',0
