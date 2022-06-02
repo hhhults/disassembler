@@ -9,7 +9,7 @@ START:
         JSR        WELCOME
         ;MOVEA.L     #$5000,A2    * for testing
         ;MOVEA.L     #$527D,A3
-        MOVEA.L     #$00000500,A5
+        MOVEA.L     EA_TREE,A5
         MOVEA.L     BEGIN,A4      * does this need to be W depending on where in mem start is?
         JSR         BUILD_EA_TREE
         JSR         BUILDTREE
@@ -1157,10 +1157,10 @@ IF_F
 
     
 * var storage
-TREE        DC.L    $7000  
-EA_TREE     DC.L    $0500
-BEGIN       DS.L    $2000
-END         DS.L    $3000  
+TREE        DC.L    $0010  
+EA_TREE     DC.L    $0830
+BEGIN       DS.L    $FFFF
+END         DS.L    $FFFF  
 * string storage
 CR          EQU     $0D
 LF          EQU     $09
