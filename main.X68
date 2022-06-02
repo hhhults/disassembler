@@ -1,6 +1,6 @@
 *-----------------------------------------------------------
 * Title      : motorola 68k disassembler prototype
-* Written by : Harper Hults, Camas Collins also helped a little
+* Written by : Harper Hults, Camas Collins
 * Date       : 5/29/22
 * Description: allows for decoding of opcodes.
 *-----------------------------------------------------------
@@ -8,13 +8,22 @@
 START:
         *JSR        WELCOME
         MOVEA.L     #$5000,A2    * for testing
-        MOVEA.L     #$5041,A3
+        MOVEA.L     #$5100,A3
         MOVEA.L     #$00000500,A5
         MOVEA.L     A2,A4      * does this need to be W depending on where in mem start is?
         JSR         BUILD_EA_TREE
         JSR         BUILDTREE
+LOOP
         CLR.B       D2
-        JSR         BLOCK_OUT    
+        JSR         BLOCK_OUT
+        MOVE.B      #14,D0
+        
+        LEA         IOMSG,A1
+        TRAP        #15
+        
+        MOVE.B      #2,D0
+        TRAP        #15
+        BRA         LOOP    
     
 NEXTLINE
         CLR.L       D4
@@ -37,7 +46,7 @@ BLOCK_OUT
         CMPA.L      END,A4
         BLE         DONE
         ADDQ        #1,D2
-        CMP.B       #$20,D2
+        CMP.B       #$1F,D2
         BNE         BLOCK_OUT
         RTS
 
@@ -1093,6 +1102,7 @@ PROMPT1     DC.B    'Please enter the memory value of the start of the program: 
 PROMPT2     DC.B    'Please enter the memory value of the end of the program: ',0
 UNDEFINED   DC.B    'The program should never reach this state.',0
 DONEMSG     DC.B    'You have reached the end of the disassembler.',0
+IOMSG       DC.B    'Press enter to see the next screen of data.',0
 BADDATA     DC.B    ' Data ',0
 MQ          DC.B    ' MOVEQ ',0
 MB          DC.B    ' MOVE.B ',0
@@ -1142,6 +1152,7 @@ P_SPACE     DC.B    ' ',0
 NXT_LINE    DC.B    '',CR,LF,0
 
             END     START
+
 
 
 
